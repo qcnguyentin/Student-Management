@@ -1,0 +1,31 @@
+{% extends 'layout/base.html' %}
+{% block title %} Trang chủ {% endblock %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+<div id="search-class-id" style="display: none;">
+    <form class="d-flex" action="/?next=/score">
+        <input class="form-control me-2" name="keyword" type="text" placeholder="Nhập từ khóa...">
+        <button class="btn btn-secondary">Tìm</button>
+    </form>
+</div>
+<h1 class="text-center text-success" style="padding-top: 0.5em;">Thông tin của {{ current_user.name }}</h1>
+<hr/>
+<div class="user-infor">
+    <div>
+        <img src="{{ current_user.avatar }}" alt="AVATAR">
+    </div>
+    <div>
+        <h5>Mã: {{ current_user.id }}</h5>
+        <h5>Tên: {{ current_user.name }}</h5>
+        {% if user_role == 1 %}
+        <h5>Chức vụ: Giáo viên</h5>
+        {% elif user_role == 2 %}
+        <h5>Chức vụ: Nhân viên</h5>
+        {% else %}
+        <h5>Chức vụ: Quản trị viên</h5>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

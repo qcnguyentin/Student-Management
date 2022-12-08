@@ -1,0 +1,218 @@
+* {
+    font-family: Arial;
+}
+
+.bg-new{
+    background: #e3eef6;
+}
+
+body {
+    position: relative;
+}
+
+.navbar-brand, .nav-link, .fa-home:before{
+    background: #e3eef6 !important;
+    color: #656666 !important;
+}
+
+.nav-link:hover {
+    color: #000000 !important;
+}
+
+.logo{
+    background: #2196f3;
+    width:100%;
+}
+
+.ft{
+    background-color: black;
+    position: fixed;
+    width: 100%;
+    padding: 15px;
+    bottom: 0;
+    text-align: center;
+    font-size: 15px;
+    color: white;
+}
+
+
+.img-logo{
+    max-width: 25%;
+    width:100%;
+}
+
+.ft h1, p{
+    font-size: 16px;
+    background: black;
+}
+
+.tb-notification, th, td {
+  border: 1px solid;
+  border-collapse: collapse;
+  padding:1em;
+}
+
+.tb-notification {
+  width: 90%;
+  text-align:center;
+  margin: 0 auto;
+}
+
+.tb-note {
+  overflow: auto;
+  height: 28.5em;
+}
+
+.sc-note {
+  overflow: auto;
+  height: 16.5em;
+}
+
+.sc-note table{
+    border: 2px solid;
+    border: 2px solid;
+}
+
+.tb-notification th {
+    background: #63d8d9;
+}
+
+hr{
+    margin: 8px 0 !important;
+}
+
+#boxnoidung {
+    position:fixed;
+    z-index:99;
+    top: 20%;
+    left:30%;
+    border:solid;
+    border-radius: 2%;
+}
+
+#boxaddscore {
+    position:fixed;
+    top: 5%;
+    left:25%;
+    border-radius: 2%;
+    width: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.lf {
+    position:absolute !important;
+    right: 2%;
+}
+
+.error-msg {
+    position: fixed !important;
+    right: 5px;
+    bottom: 0;
+    animation: hide 5s ease-in forwards;
+    z-index: 99;
+}
+
+@keyframes hide {
+    0%{
+        opacity: 1;
+    }
+    50%{
+        opacity: 0.9;
+    }
+    60%{
+        opacity: 0.8;
+    }
+    70%{
+        opacity: 0.7;
+    }
+    80%{
+        opacity: 0.6;
+    }
+    100%{
+        opacity: 0;
+    }
+}
+
+.user-infor {
+    display:flex;
+    flex-direction:row;
+    flex-wrap: wrap;
+}
+
+.user-infor > div {
+    max-width:30%;
+}
+.user-infor img {
+    width: 100%;
+}
+
+#search-id {
+    position: relative;
+}
+
+#search-id input {
+    width: 300px;
+    margin: 0 auto;
+}
+
+
+.search-student select {
+    border: 1px solid;
+    width: 15%;
+    margin: 0 2% 0 5%;
+}
+
+.search-student > div:last-child {
+    border: 2px solid;
+    border-bottom: 0;
+    width:90%;
+    height:22em;
+    overflow: auto;
+    margin: 0 auto;
+}
+
+.search-student div:first-child {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+#input-search-class, #input-search-MSHS {
+    display: none;
+}
+
+.tb-notification-student {
+  width: 100%;
+}
+
+.input-score input{
+    height: 35px;
+    width: 100%;
+}
+
+#search-class-id {
+    position: fixed;
+    top: 10%;
+    right: 5%;
+}
+
+#search-class-score {
+    position: relative;
+    width: 300px;
+    top: 10%;
+    left: 5%;
+    padding: 10px;
+}
+
+#add-score form{
+    display: flex;
+}
+
+#add-score h5{
+    font-size:16px;
+    width:50%;
+}
+
+.input-score {
+    width: 40%;
+    margin-right: 10%;
+}

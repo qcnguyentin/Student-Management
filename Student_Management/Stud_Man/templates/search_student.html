@@ -1,0 +1,70 @@
+{% extends 'layout/base.html' %}
+{% block title %} Trang chủ {% endblock %}
+
+{% block content %}
+<div id="search-class-id" style="display: none;">
+    <form class="d-flex" action="/search">
+        <input class="form-control me-2" name="keyword" type="text" placeholder="Nhập từ khóa...">
+        <button class="btn btn-secondary">Tìm</button>
+    </form>
+</div>
+<h1 class="text-center text-success" style="padding-top: 0.5em;">TÌM THÔNG TIN HỌC SINH</h1>
+<div class="search-student" id="search-student-id">
+    <div>
+        <select class="form-control" title="Nhấn để thay đổi phương thức tìm kiếm">
+            <option id="search-with-name">Tìm theo tên</option>
+            <option id="search-with-class">Tìm theo lớp</option>
+            <option id="search-with-MSHS">Tìm theo MSHS</option>
+        </select>
+        <div id="input-search-name">
+            <form class="d-flex" action="/search">
+                <input class="form-control me-2" name="student-name" type="text"
+                       placeholder="Nhập tên...">
+                <button class="btn btn-secondary" type="submit">Tìm</button>
+            </form>
+        </div>
+        <div id="input-search-class">
+            <form class="d-flex" action="/search">
+                <input class="form-control me-2" name="student-class" type="text"
+                       placeholder="Nhập lớp...">
+                <button class="btn btn-secondary" type="submit">Tìm</button>
+            </form>
+        </div>
+        <div id="input-search-MSHS">
+            <form class="d-flex" action="/search">
+                <input class="form-control me-2" name="student-mshs" type="text"
+                       placeholder="Nhập mshs...">
+                <button class="btn btn-secondary" type="submit">Tìm</button>
+            </form>
+        </div>
+    </div>
+    <div>
+        {% if name %}
+        <table class="tb-notification tb-notification-student">
+            <tr>
+                <th>Mã học sinh</th>
+                <th>Tên</th>
+                <th>Lớp</th>
+                <th>Giới tính</th>
+                <th>Ngày sinh</th>
+                <th>Quê quán</th>
+                <th>Mail</th>
+            </tr>
+            {% for i in name %}
+            <tr class="tb-notification-content">
+                <td>{{ i[0] }}</td>
+                <td>{{ i[1] }}</td>
+                <td>{{ i[2] }}</td>
+                <td>{{ i[3] }}</td>
+                <td>{{ i[4] }}</td>
+                <td>{{ i[5] }}</td>
+                <td>{{ i[6] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <h5 class="text-danger">Không tìm thấy học sinh phù hợp</h5>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

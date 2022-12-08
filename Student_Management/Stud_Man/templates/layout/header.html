@@ -1,0 +1,90 @@
+<nav class="navbar navbar-expand-sm bg-new navbar-dark">
+    <!-- Brand -->
+    <a class="navbar-brand" href="#">QUẢN LÝ HỌC SINH</a>
+    <!-- Links -->
+    <!-- đăng nhập không thành công hoặc lỗi -->
+    {% if err_msg %}
+    <div class="alert alert-danger error-msg">
+        {{ err_msg }}
+    </div>
+    {% endif %}
+
+    <ul class="navbar-nav flx">
+
+        <li class="nav-item">
+            <a class="nav-link" href="/"><i class="fa fa-home"></i> Trang chủ</a>
+        </li>
+
+        <!-- nếu đăng nhập thành công -->
+        {% if current_user.is_authenticated %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                Chức năng
+            </a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="javascript:;" onclick="displayStatus()">Tìm lớp</a>
+                {% if user_role == 1 %}
+                <a class="dropdown-item" href="/score">quản lý điểm</a>
+                {% else %}
+            </div>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">{{ user_role }}</a>
+            </div>
+            {% endif %}
+        </li>
+        <li class="nav-item dropdown lf">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">
+                {{ current_user.name }}
+                <img src="{{ current_user.avatar }}" width="30" class="rounded-circle"
+                     name="{{ current_user.name }}"/>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="/inform">Thông tin</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/logout">Đăng xuất</a>
+            </div>
+        </li>
+        <li>
+            <a class="nav-link" href="/search">Tìm kiếm học sinh</a>
+        </li>
+
+
+        <!-- nếu chưa thành công -->
+        {% else %}
+        <li class="nav-item lf">
+            <a class="nav-link" href="#" data-toggle="collapse" data-target="#boxnoidung">Đăng nhập</a>
+        </li>
+        {% endif %}
+    </ul>
+
+    <!--login-->
+    <div class="collapse mt-4" id="boxnoidung">
+        <div class="card card-body">
+            <div id="login-user">
+                <h1 class="text-center text-success">ĐĂNG NHẬP NGƯỜI DÙNG</h1>
+                <form method="post" enctype="multipart/form-data">
+                    <div class="form-floating mb-3 mt-3">
+                        <input type="text" class="form-control" required id="username"
+                               placeholder="Nhập tên đăng nhập"
+                               name="username">
+                        <label for="username">Tên đăng nhập</label>
+                    </div>
+                    <div class="form-floating mt-3 mb-3">
+                        <input type="password" class="form-control" required id="password"
+                               placeholder="Nhập mật khẩu"
+                               name="password">
+                        <label for="password">Mật khẩu</label>
+                    </div>
+                    <div class="form-floating mt-3 mb-3">
+                        <input type="submit" value="Đăng nhập" class="btn btn-danger"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</nav>
+<div class="logo">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-logo"/>
+</div>

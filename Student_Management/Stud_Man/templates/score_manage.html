@@ -1,0 +1,131 @@
+{% extends 'layout/base.html'%}
+{% block title %} Trang chủ {% endblock %}
+
+{% block content %}
+<h1 class="text-center text-success" style="padding-top: 0.5em;">Quản lý điểm</h1>
+{% if 'score' in session and session['score'] %}
+<div id="search-class-score">
+    <form class="d-flex" action="/score">
+        <input class="form-control me-2" name="keyword" type="text" placeholder="Nhập từ khóa...">
+        <button class="btn btn-secondary">Tìm</button>
+    </form>
+</div>
+
+<div class="sc-note">
+    {% if rep %}
+    <table class="tb-notification">
+        <tr>
+            <th>Tên học sinh</th>
+            <th>Điểm 15'</th>
+            <th>Điểm 1 tiết</th>
+            <th>Điểm thi</th>
+            <th>Lớp</th>
+            <th>Môn học</th>
+            <th>Học kỳ</th>
+            <th>Môn học</th>
+            <th></th>
+        </tr>
+        {% for s in rep %}
+        <tr class="tb-notification-content" id="score{{s.score_id}}">
+            <td>{{ s[0] }}</td>
+            {% if s[3] == "15p" %}
+            <td>{{ s[1] }}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            {% if s[3] == "45p" %}
+            <td>{{ s[1] }}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            {% if s[3] == "CK" %}
+            <td>{{ s[1] }}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td>{{ s[4] }}</td>
+            <td>{{ s[5] }}</td>
+            <td>{{ s[6] }}</td>
+            <td>{{ s[7] }}</td>
+            <td>
+                <input type="button" value="Sửa">
+                <input type="button" value="Xóa">
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <h5 class="tb-notification">Không tìm thấy</h5>
+    {% endif %}
+
+</div>
+<div style="margin-left:5%; padding-top:1em;" >
+    <input type="button" value="Thêm" class="btn btn-primary" data-toggle="collapse" data-target="#boxaddscore">
+</div>
+<div class="collapse mt-4" id="boxaddscore">
+    <div class="card card-body">
+        <h1 class="text-center text-success">Thêm điểm</h1>
+        <div id="add-score">
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-floating mt-3 mb-3 input-score">
+                    <h5>Nhập điểm</h5>
+                    <input type="text">
+                </div>
+                <div class="form-floating mb-3 mt-3 select-score input-score">
+                    <form>
+                        <h5>Chọn loại điểm</h5>
+                        <select name="cars" class="custom-select">
+                            <option selected>Điểm 15p</option>
+                            <option>Điểm 1 tiết</option>
+                            <option>Điểm thi</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="form-floating mb-3 mt-3 select-score">
+                    <form>
+                        <h5>Chọn học sinh</h5>
+                        <select name="cars" class="custom-select">
+                            {% for a in student_name %}
+                            <option>{{a[1]}}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                <div class="form-floating mb-3 mt-3 select-score">
+                    <form>
+                        <h5>Chọn lớp:</h5>
+                        <select name="cars" class="custom-select">
+                            {% for a in class_name %}
+                            <option>{{a[1]}}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                <div class="form-floating mb-3 mt-3 select-score">
+                    <form>
+                        <h5>Chọn học kỳ:</h5>
+                        <select name="cars" class="custom-select">
+                            <option>1</option>
+                            <option>2</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="form-floating mb-3 mt-3 select-score">
+                    <form>
+                        <h5>Chọn năm học:</h5>
+                        <select name="cars" class="custom-select">
+                            {% for i in semester %}
+                            <option>{{ i[2] }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                <div class="form-floating mt-3 mb-3 full-width">
+                    <input type="submit" value="Thêm" class="btn btn-danger" name="add-score"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
