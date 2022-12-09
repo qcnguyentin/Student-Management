@@ -1,9 +1,11 @@
 {% extends 'layout/base.html'%}
 {% block title %} Trang chủ {% endblock %}
+{% block js %}
+<script src="{{ url_for('static', filename='js/score.js') }}"></script>
+{% endblock %}
 
 {% block content %}
 <h1 class="text-center text-success" style="padding-top: 0.5em;">Quản lý điểm</h1>
-{% if 'score' in session and session['score'] %}
 <div id="search-class-score">
     <form class="d-flex" action="/score">
         <input class="form-control me-2" name="keyword" type="text" placeholder="Nhập từ khóa...">
@@ -16,42 +18,28 @@
     <table class="tb-notification">
         <tr>
             <th>Tên học sinh</th>
-            <th>Điểm 15'</th>
-            <th>Điểm 1 tiết</th>
+            <th>Loại điểm</th>
             <th>Điểm thi</th>
             <th>Lớp</th>
             <th>Môn học</th>
             <th>Học kỳ</th>
-            <th>Môn học</th>
             <th></th>
         </tr>
         {% for s in rep %}
+        {% if kw in s.class.name %}
         <tr class="tb-notification-content" id="score{{s.score_id}}">
-            <td>{{ s[0] }}</td>
-            {% if s[3] == "15p" %}
-            <td>{{ s[1] }}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            {% if s[3] == "45p" %}
-            <td>{{ s[1] }}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            {% if s[3] == "CK" %}
-            <td>{{ s[1] }}</td>
-            {% else %}
-            <td></td>
-            {% endif %}
-            <td>{{ s[4] }}</td>
-            <td>{{ s[5] }}</td>
-            <td>{{ s[6] }}</td>
-            <td>{{ s[7] }}</td>
+            <td>{{ s.student.name}}</td>
+            <td>{{ s.score }}</td>
+            <td>{{ s.type_score }}</td>
+            <td>{{ s.class.name }}</td>
+            <td>{{ s.subject.name }}</td>
+            <td>Học kỳ {{ s.semester.semester }}, Năm {{ s.semester.year }}</td>
             <td>
                 <input type="button" value="Sửa">
                 <input type="button" value="Xóa">
             </td>
         </tr>
+        {% endif %}
         {% endfor %}
     </table>
     {% else %}
@@ -69,12 +57,12 @@
             <form method="post" enctype="multipart/form-data">
                 <div class="form-floating mt-3 mb-3 input-score">
                     <h5>Nhập điểm</h5>
-                    <input type="text">
+                    <input type="text" class="1">
                 </div>
                 <div class="form-floating mb-3 mt-3 select-score input-score">
                     <form>
                         <h5>Chọn loại điểm</h5>
-                        <select name="cars" class="custom-select">
+                        <select name="cars" class="custom-select 1">
                             <option selected>Điểm 15p</option>
                             <option>Điểm 1 tiết</option>
                             <option>Điểm thi</option>
@@ -84,9 +72,19 @@
                 <div class="form-floating mb-3 mt-3 select-score">
                     <form>
                         <h5>Chọn học sinh</h5>
-                        <select name="cars" class="custom-select">
-                            {% for a in student_name %}
-                            <option>{{a[1]}}</option>
+                        <select name="cars" class="custom-select 1">
+                            {% for a in student %}
+                            <option>{{a.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                <div class="form-floating mb-3 mt-3 select-score">
+                    <form>
+                        <h5>Chọn môn học</h5>
+                        <select name="cars" class="custom-select 1">
+                            {% for a in subject %}
+                            <option>{{a.name}}</option>
                             {% endfor %}
                         </select>
                     </form>
@@ -94,9 +92,9 @@
                 <div class="form-floating mb-3 mt-3 select-score">
                     <form>
                         <h5>Chọn lớp:</h5>
-                        <select name="cars" class="custom-select">
+                        <select name="cars" class="custom-select 1">
                             {% for a in class_name %}
-                            <option>{{a[1]}}</option>
+                            <option>{{a.name}}</option>
                             {% endfor %}
                         </select>
                     </form>
@@ -104,7 +102,7 @@
                 <div class="form-floating mb-3 mt-3 select-score">
                     <form>
                         <h5>Chọn học kỳ:</h5>
-                        <select name="cars" class="custom-select">
+                        <select name="cars" class="custom-select 1">
                             <option>1</option>
                             <option>2</option>
                         </select>
@@ -113,19 +111,20 @@
                 <div class="form-floating mb-3 mt-3 select-score">
                     <form>
                         <h5>Chọn năm học:</h5>
-                        <select name="cars" class="custom-select">
+                        <select name="cars" class="custom-select 1">
                             {% for i in semester %}
-                            <option>{{ i[2] }}</option>
+                            <option>{{ i.year }}</option>
                             {% endfor %}
                         </select>
                     </form>
                 </div>
                 <div class="form-floating mt-3 mb-3 full-width">
-                    <input type="submit" value="Thêm" class="btn btn-danger" name="add-score"/>
+                    <input type="submit" value="Thêm" class="btn btn-danger" onclick="checkValue()" name="add-score"/>
                 </div>
             </form>
         </div>
     </div>
 </div>
-{% endif %}
+<div class="spinner-grow text-primary my-spinner"></div>
+<ul class="list-group mt-2" id="comments"></ul>
 {% endblock %}

@@ -1,9 +1,11 @@
 import flask_login
 from flask_login import login_user, login_required, logout_user, current_user
+from sqlalchemy.sql.functions import current_user
+
 from Stud_Man import app, admin, login, controller, utils
 from flask import render_template, redirect, request, session, jsonify
 import dao
-from Stud_Man.models import UserRole
+from Stud_Man.models import UserRole, Semester, Subject, Class, Student
 from Stud_Man.decorators import anonymous_user
 from Stud_Man.utils import *
 
@@ -17,46 +19,56 @@ def index():
 
 @app.route("/search")
 def search_student():
-    rep = dao.teach_class(kw=request.args.get('keyword'))
+    kw = request.args.get('keyword')
+    if kw:
+        kw = kw
+    else:
+        kw = ''
     user_role = check_user_role()
     name = dao.student_search(student_name=request.args.get('student-name'),
                               student_class=request.args.get('student-class'),
                               student_mshs=request.args.get('student-mshs'))
-    return render_template('search_student.html', name=name, user_role=user_role, rep=rep)
+    return render_template('search_student.html', name=name, user_role=user_role, kw=kw)
 
 
 @app.route('/score')
 def score_manage():
-    rep = dao.student_score(kw=request.args.get('keyword'))
-    add = dao.student_score('')
-    student_name = dao.select_student()
-    class_name = dao.select_class()
-    semester = dao.select_semester()
+    rep = dao.student_score()
     user_role = check_user_role()
-    # score_15p = []
-    # score_45p = []
-    # score_ck = []
+    semester = dao.semester()
+    subject = dao.subject()
+    class_name = dao.class_name()
+    student = dao.student()
+    kw = request.args.get('keyword')
+    if kw:
+        kw = kw
+    else:
+        kw = ''
 
     # for s in rep:
-    #     student_name = s[0]
-    #     score_value = s[1]
-    #     score_id = str(s[2])
-    #     type_score = s[3]
-    #     class_name = s[4]
-    #     key = app.config['SCORE_KEY']
-    #     score = session.get(key, {})
-    #     if score_id not in score:
-    #         score[score_id] = {
-    #             "stud_name": student_name,
-    #             "type_sco": type_score,
-    #             "score_id": score_id,
-    #             "score_val": score_value,
-    #             "cl_name": class_name
-    #         }
+    #     if s.student.name not in data:
+    #         if s.type_score == '15p':
+    #             data.append({
+    #                 'student_name': s.student.name,
+    #                 'diem15p': [s.score],
+    #             })
+        # score_value = s[1]
+        # score_id = str(s[2])
+        # type_score = s[3]
+        # class_name = s[4]
+        # key = app.config['SCORE_KEY']
+        # score = session.get(key, {})
+        # if score_id not in score:
+        #     score[score_id] = {
+        #         "stud_name": student_name,
+        #         "type_sco": type_score,
+        #         "score_id": score_id,
+        #         "score_val": score_value,
+        #         "cl_name": class_name
+        #     }
     # session[key] = score
 
-    return render_template('score_manage.html', user_role=user_role, rep=rep, add=add, student_name=student_name,
-                           class_name=class_name, semester=semester)
+    return render_template('score_manage.html', user_role=user_role, rep=rep, class_name=class_name, student=student, subject=subject, semester=semester, kw=kw)
 
 
 @app.route("/inform")

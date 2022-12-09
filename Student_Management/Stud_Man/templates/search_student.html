@@ -51,6 +51,7 @@
                 <th>Mail</th>
             </tr>
             {% for i in name %}
+            {% if kw in i[2] %}
             <tr class="tb-notification-content">
                 <td>{{ i[0] }}</td>
                 <td>{{ i[1] }}</td>
@@ -60,6 +61,7 @@
                 <td>{{ i[5] }}</td>
                 <td>{{ i[6] }}</td>
             </tr>
+            {% endif %}
             {% endfor %}
         </table>
         {% else %}

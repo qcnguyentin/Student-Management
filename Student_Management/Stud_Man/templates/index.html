@@ -3,7 +3,7 @@
 
 {% block content %}
 <div id="search-class-id" style="display: none;">
-    <form class="d-flex" action="/?next=/score">
+    <form class="d-flex" action="/">
         <input class="form-control me-2" name="keyword" type="text" placeholder="Nhập từ khóa...">
         <button class="btn btn-secondary">Tìm</button>
     </form>
@@ -14,19 +14,13 @@
         <tr>
             <th>Lớp</th>
             <th>Giảng viên phụ trách</th>
-            <th>Sĩ số</th>
-            {% if current_user.is_authenticated %}
             <th>Ngày phụ trách</th>
-            {% endif %}
         </tr>
         {% for i in rep %}
         <tr class="tb-notification-content">
             <td>{{ i[0] }}</td>
             <td>{{ i[1] }}</td>
             <td>{{ i[2] }}</td>
-            {% if current_user.is_authenticated %}
-            <td>{{ i[3] }}</td>
-            {% endif %}
         </tr>
         {% endfor %}
     </table>
