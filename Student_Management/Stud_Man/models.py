@@ -48,11 +48,11 @@ class Regulation(BaseModel):
     #     return self.user_id
 
 
-class Class(BaseModel):
+class MyClass(BaseModel):
     name = Column(String(20), nullable=False)
     teacher_class = relationship('TeacherClass', backref=backref('class'), lazy=True)
     student_class = relationship('StudentClass', backref=backref('class'), lazy=True)
-    score = relationship('Score', backref=backref('class'), lazy=True)
+    score = relationship('Score', backref=backref('my_class'), lazy=True)
 
     def __str__(self):
         return self.name
@@ -95,18 +95,18 @@ class Score(BaseModel):
     student_id = Column(Integer, ForeignKey(Student.id), nullable=False)
     subject_id = Column(Integer, ForeignKey(Subject.id), nullable=False)
     semester_id = Column(Integer, ForeignKey(Semester.id), nullable=False)
-    class_id = Column(Integer, ForeignKey(Class.id), nullable=False)
+    class_id = Column(Integer, ForeignKey(MyClass.id), nullable=False)
 
 
 class TeacherClass(BaseModel):
     date = Column(DateTime, default=datetime.now())
     teacher_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    class_id = Column(Integer, ForeignKey(Class.id), nullable=False)
+    class_id = Column(Integer, ForeignKey(MyClass.id), nullable=False)
 
 
 class StudentClass(BaseModel):
     student_id = Column(Integer, ForeignKey(Student.id), nullable=False)
-    class_id = Column(Integer, ForeignKey(Class.id), nullable=False)
+    class_id = Column(Integer, ForeignKey(MyClass.id), nullable=False)
 
 
 class StudentSemester(BaseModel):

@@ -1,10 +1,9 @@
 {% extends 'layout/base.html'%}
 {% block title %} Trang chủ {% endblock %}
-{% block js %}
-<script src="{{ url_for('static', filename='js/score.js') }}"></script>
-{% endblock %}
+
 
 {% block content %}
+
 <h1 class="text-center text-success" style="padding-top: 0.5em;">Quản lý điểm</h1>
 <div id="search-class-score">
     <form class="d-flex" action="/score">
@@ -14,8 +13,7 @@
 </div>
 
 <div class="sc-note">
-    {% if rep %}
-    <table class="tb-notification">
+    <table class="tb-notification" id="tb-scores">
         <tr>
             <th>Tên học sinh</th>
             <th>Loại điểm</th>
@@ -25,26 +23,23 @@
             <th>Học kỳ</th>
             <th></th>
         </tr>
-        {% for s in rep %}
-        {% if kw in s.class.name %}
-        <tr class="tb-notification-content" id="score{{s.score_id}}">
-            <td>{{ s.student.name}}</td>
-            <td>{{ s.score }}</td>
-            <td>{{ s.type_score }}</td>
-            <td>{{ s.class.name }}</td>
-            <td>{{ s.subject.name }}</td>
-            <td>Học kỳ {{ s.semester.semester }}, Năm {{ s.semester.year }}</td>
-            <td>
-                <input type="button" value="Sửa">
-                <input type="button" value="Xóa">
-            </td>
-        </tr>
-        {% endif %}
-        {% endfor %}
+<!--        {% for s in data %}-->
+<!--        {% if kw in s.class_name %}-->
+<!--        <tr class="tb-notification-content" id="score{{s.score_id}}">-->
+<!--            <td class="{{ s.student_name}}"> {{ s.student_name}}</td>-->
+<!--            <td>{{ s.type_score }}</td>-->
+<!--            <td>{{ s.score }}</td>-->
+<!--            <td>{{ s.class_name }}</td>-->
+<!--            <td>{{ s.subject_name }}</td>-->
+<!--            <td>Học kỳ {{ s.semester }}, Năm {{ s.year }}</td>-->
+<!--            <td>-->
+<!--                <input type="button" value="Sửa">-->
+<!--                <input type="button" value="Xóa">-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--        {% endif %}-->
+<!--        {% endfor %}-->
     </table>
-    {% else %}
-    <h5 class="tb-notification">Không tìm thấy</h5>
-    {% endif %}
 
 </div>
 <div style="margin-left:5%; padding-top:1em;" >
@@ -127,4 +122,12 @@
 </div>
 <div class="spinner-grow text-primary my-spinner"></div>
 <ul class="list-group mt-2" id="comments"></ul>
+{% endblock %}
+{% block js %}
+<script src="{{ url_for('static', filename='js/score.js') }}"></script>
+<script>
+    window.onload = function() {
+        loadScores()
+    }
+</script>
 {% endblock %}

@@ -23,10 +23,9 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 
-    {% block css %} {% endblock %}
-    {% block js %} {% endblock %}
+
 </head>
-<body onchange="SearchStudentBtn()">
+<body>
 {% block header %}
 {% include 'layout/header.html' %}
 {% endblock %}
@@ -38,5 +37,7 @@
 {% block footer %}
 {% include 'layout/footer.html' %}
 {% endblock %}
+{% block css %} {% endblock %}
+{% block js %} {% endblock %}
 </body>
 </html>

@@ -3,7 +3,7 @@ from Stud_Man import app, db
 from flask_login import current_user
 from sqlalchemy import func
 import hashlib
-from Stud_Man.models import User, UserRole, Class, UserSubject, UserSemester, StudentSemester, Subject, \
+from Stud_Man.models import User, UserRole, MyClass, UserSubject, UserSemester, StudentSemester, Subject, \
     TeacherClass, Student, Semester, Regulation, StudentClass, Score
 
 
@@ -21,13 +21,13 @@ def auth_user(username, password):
 
 
 def teach_class(kw=None):
-    query = db.session.query(Class.name, User.name, TeacherClass.date) \
-        .join(Class, TeacherClass.class_id.__eq__(Class.id)) \
+    query = db.session.query(MyClass.name, User.name, TeacherClass.date) \
+        .join(MyClass, TeacherClass.class_id.__eq__(MyClass.id)) \
         .join(User, TeacherClass.teacher_id.__eq__(User.id)) \
-        .order_by(Class.name)
+        .order_by(MyClass.name)
 
     if kw:
-        query = query.filter(Class.name.contains(kw))
+        query = query.filter(MyClass.name.contains(kw))
 
     return query.all()
 
@@ -42,7 +42,7 @@ def student():
 
 
 def class_name():
-    return Class.query.all()
+    return MyClass.query.all()
 
 
 def subject():
@@ -54,7 +54,7 @@ def semester():
 
 
 def student_id(keyword):
-    query = Class.query.all()
+    query = MyClass.query.all()
     for s in query:
         if keyword:
             if s.name.contains(keyword):
@@ -63,17 +63,17 @@ def student_id(keyword):
 
 
 def student_search(student_name=None, student_class=None, student_mshs=None):
-    query = db.session.query(Student.id, Student.name, Class.name, Student.sex, Student.dob, Student.address,
+    query = db.session.query(Student.id, Student.name, MyClass.name, Student.sex, Student.dob, Student.address,
                              Student.email) \
         .join(StudentClass, Student.id.__eq__(StudentClass.student_id)) \
-        .join(Class, StudentClass.class_id.__eq__(Class.id)) \
+        .join(MyClass, StudentClass.class_id.__eq__(MyClass.id)) \
         .order_by(Student.id)
 
     if student_name:
         query = query.filter(Student.name.contains(student_name))
 
     if student_class:
-        query = query.filter(Class.name.contains(student_class))
+        query = query.filter(MyClass.name.contains(student_class))
 
     if student_mshs:
         query = query.filter(Student.id.contains(student_mshs))
@@ -82,13 +82,13 @@ def student_search(student_name=None, student_class=None, student_mshs=None):
 
 
 def load_class(class_id=None, kw=None):
-    query = Class.query.filter(Class.active.__eq__(True))
+    query = MyClass.query.filter(MyClass.active.__eq__(True))
 
     if class_id:
-        query = query.filter(Class.id.__eq__(class_id))
+        query = query.filter(MyClass.id.__eq__(class_id))
 
     if kw:
-        query = query.filter(Class.name.contains(kw))
+        query = query.filter(MyClass.name.contains(kw))
 
     return query.all()
 
@@ -99,5 +99,5 @@ def save_score():
 
 if __name__ == '__main__':
     with app.app_context():
-        rep3 = student_score("10A")
+        rep3 = student_score()
         print(rep3)

@@ -5,7 +5,7 @@ from sqlalchemy.sql.functions import current_user
 from Stud_Man import app, admin, login, controller, utils
 from flask import render_template, redirect, request, session, jsonify
 import dao
-from Stud_Man.models import UserRole, Semester, Subject, Class, Student
+from Stud_Man.models import UserRole, Semester, Subject, MyClass, Student
 from Stud_Man.decorators import anonymous_user
 from Stud_Man.utils import *
 
@@ -33,43 +33,39 @@ def search_student():
 
 @app.route('/score')
 def score_manage():
-    rep = dao.student_score()
     user_role = check_user_role()
     semester = dao.semester()
     subject = dao.subject()
     class_name = dao.class_name()
     student = dao.student()
+
+    return render_template('score_manage.html', user_role=user_role, class_name=class_name, student=student, subject=subject, semester=semester)
+
+
+@app.route('/api/score/score-list')
+def load_score():
+    rep = dao.student_score()
     kw = request.args.get('keyword')
+    data = []
     if kw:
         kw = kw
     else:
         kw = ''
 
-    # for s in rep:
-    #     if s.student.name not in data:
-    #         if s.type_score == '15p':
-    #             data.append({
-    #                 'student_name': s.student.name,
-    #                 'diem15p': [s.score],
-    #             })
-        # score_value = s[1]
-        # score_id = str(s[2])
-        # type_score = s[3]
-        # class_name = s[4]
-        # key = app.config['SCORE_KEY']
-        # score = session.get(key, {})
-        # if score_id not in score:
-        #     score[score_id] = {
-        #         "stud_name": student_name,
-        #         "type_sco": type_score,
-        #         "score_id": score_id,
-        #         "score_val": score_value,
-        #         "cl_name": class_name
-        #     }
-    # session[key] = score
-
-    return render_template('score_manage.html', user_role=user_role, rep=rep, class_name=class_name, student=student, subject=subject, semester=semester, kw=kw)
-
+    for s in rep:
+        if kw in s.student.name:
+            data.append({
+                'score_id': s.id,
+                'student_name': s.student.name,
+                'score': s.score,
+                'type_score': s.type_score,
+                'class_name': s.my_class.name,
+                'semester': s.semester.semester,
+                'subject_name': s.subject.name,
+                'year': s.semester.semester
+            })
+    print(data)
+    return jsonify(data)
 
 @app.route("/inform")
 def inform():

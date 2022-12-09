@@ -41,9 +41,8 @@ class CKTextAreaField(TextAreaField):
 class RegulationView(AuthenticatedModelView):
     can_view_details = True
     can_export = True
-    column_filters = ('content', 'id', 'user.name')
+    # column_filters = ('id', 'user.name')
     column_labels = {
-        'content': 'Nội dung',
         'user': 'Người chỉnh sửa'
     }
     page_size = 6
