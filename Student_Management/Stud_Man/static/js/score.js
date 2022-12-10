@@ -79,7 +79,7 @@ function addScore() {
        } else if (data.status == 501)
             alert("Điểm không hợp lệ")
        else if (data.status == 502)
-            alert("Lỗi thông tin học sinh")
+            alert("Lỗi thông tin học sinh (Lớp hoặc học kỳ hoặc năm học không hợp lệ)")
        else
             alert("Lỗi chưa xác định")
 
