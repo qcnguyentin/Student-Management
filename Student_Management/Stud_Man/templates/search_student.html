@@ -11,7 +11,7 @@
 <h1 class="text-center text-success" style="padding-top: 0.5em;">TÌM THÔNG TIN HỌC SINH</h1>
 <div class="search-student" id="search-student-id">
     <div>
-        <select class="form-control" title="Nhấn để thay đổi phương thức tìm kiếm">
+        <select class="form-control" title="Nhấn để thay đổi phương thức tìm kiếm" onchange="SearchStudentBtn()">
             <option id="search-with-name">Tìm theo tên</option>
             <option id="search-with-class">Tìm theo lớp</option>
             <option id="search-with-MSHS">Tìm theo MSHS</option>
@@ -40,7 +40,7 @@
     </div>
     <div>
         {% if name %}
-        <table class="tb-notification tb-notification-student">
+        <table class="tb-notification tb-notification-student table-bordered table-hover">
             <tr>
                 <th>Mã học sinh</th>
                 <th>Tên</th>

@@ -27,7 +27,7 @@ function SearchStudentBtn(){
     input_search_class.style.display = 'block';
     input_search_MSHS.style.display = 'none';
   }
-  else {
+  else if ( search_with_MSHS.selected == true ){
     input_search_name.style.display = 'none';
     input_search_class.style.display = 'none';
     input_search_MSHS.style.display = 'block';

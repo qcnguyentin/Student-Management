@@ -13,7 +13,7 @@
 </div>
 
 <div class="sc-note">
-    <table class="tb-notification" id="tb-scores">
+    <table class="tb-notification table-bordered table-hover" id="tb-scores">
         <tr>
             <th>Tên học sinh</th>
             <th>Loại điểm</th>
@@ -23,103 +23,157 @@
             <th>Học kỳ</th>
             <th></th>
         </tr>
-<!--        {% for s in data %}-->
-<!--        {% if kw in s.class_name %}-->
-<!--        <tr class="tb-notification-content" id="score{{s.score_id}}">-->
-<!--            <td class="{{ s.student_name}}"> {{ s.student_name}}</td>-->
-<!--            <td>{{ s.type_score }}</td>-->
-<!--            <td>{{ s.score }}</td>-->
-<!--            <td>{{ s.class_name }}</td>-->
-<!--            <td>{{ s.subject_name }}</td>-->
-<!--            <td>Học kỳ {{ s.semester }}, Năm {{ s.year }}</td>-->
-<!--            <td>-->
-<!--                <input type="button" value="Sửa">-->
-<!--                <input type="button" value="Xóa">-->
-<!--            </td>-->
-<!--        </tr>-->
-<!--        {% endif %}-->
-<!--        {% endfor %}-->
     </table>
+</div>
 
+
+<div class="modal" id="myModal-update">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Sửa điểm</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        Modal body..
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
 </div>
-<div style="margin-left:5%; padding-top:1em;" >
-    <input type="button" value="Thêm" class="btn btn-primary" data-toggle="collapse" data-target="#boxaddscore">
+
+<div class="modal" id="myModal-delete">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Xóa điểm</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        Modal body..
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
 </div>
-<div class="collapse mt-4" id="boxaddscore">
-    <div class="card card-body">
-        <h1 class="text-center text-success">Thêm điểm</h1>
-        <div id="add-score">
-            <form method="post" enctype="multipart/form-data">
-                <div class="form-floating mt-3 mb-3 input-score">
-                    <h5>Nhập điểm</h5>
-                    <input type="text" class="1">
-                </div>
-                <div class="form-floating mb-3 mt-3 select-score input-score">
-                    <form>
-                        <h5>Chọn loại điểm</h5>
-                        <select name="cars" class="custom-select 1">
-                            <option selected>Điểm 15p</option>
-                            <option>Điểm 1 tiết</option>
-                            <option>Điểm thi</option>
-                        </select>
+
+<div style="margin-left:5%; padding-top:1em;">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
+        Thêm điểm
+    </button>
+</div>
+
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Thêm điểm</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div id="add-score">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="form-floating mt-3 mb-3 input-score">
+                            <h5>Nhập điểm</h5>
+                            <input type="text" id="add-score-score">
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score input-score">
+                            <form>
+                                <h5>Chọn loại điểm</h5>
+                                <select name="cars" class="custom-select" id="add-score-type">
+                                    <option selected>Điểm 15p</option>
+                                    <option>Điểm 1 tiết</option>
+                                    <option>Điểm thi</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Chọn học sinh</h5>
+                                <select name="cars" class="custom-select" id="add-score-student">
+                                    {% for a in student %}
+                                    <option>{{a.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Chọn môn học</h5>
+                                <select name="cars" class="custom-select" id="add-score-subject">
+                                    {% for a in subject %}
+                                    <option>{{a.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Chọn lớp:</h5>
+                                <select name="cars" class="custom-select" id="add-score-class">
+                                    {% for a in my_class %}
+                                    <option>{{a}}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Chọn học kỳ:</h5>
+                                <select name="cars" class="custom-select" id="add-score-semester">
+                                    <option>1</option>
+                                    <option>2</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Chọn năm học:</h5>
+                                <select name="cars" class="custom-select" id="add-score-year">
+                                    {% for i in semester %}
+                                    <option>{{ i.year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
                     </form>
                 </div>
-                <div class="form-floating mb-3 mt-3 select-score">
-                    <form>
-                        <h5>Chọn học sinh</h5>
-                        <select name="cars" class="custom-select 1">
-                            {% for a in student %}
-                            <option>{{a.name}}</option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                </div>
-                <div class="form-floating mb-3 mt-3 select-score">
-                    <form>
-                        <h5>Chọn môn học</h5>
-                        <select name="cars" class="custom-select 1">
-                            {% for a in subject %}
-                            <option>{{a.name}}</option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                </div>
-                <div class="form-floating mb-3 mt-3 select-score">
-                    <form>
-                        <h5>Chọn lớp:</h5>
-                        <select name="cars" class="custom-select 1">
-                            {% for a in class_name %}
-                            <option>{{a.name}}</option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                </div>
-                <div class="form-floating mb-3 mt-3 select-score">
-                    <form>
-                        <h5>Chọn học kỳ:</h5>
-                        <select name="cars" class="custom-select 1">
-                            <option>1</option>
-                            <option>2</option>
-                        </select>
-                    </form>
-                </div>
-                <div class="form-floating mb-3 mt-3 select-score">
-                    <form>
-                        <h5>Chọn năm học:</h5>
-                        <select name="cars" class="custom-select 1">
-                            {% for i in semester %}
-                            <option>{{ i.year }}</option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                 <div class="form-floating mt-3 mb-3 full-width">
-                    <input type="submit" value="Thêm" class="btn btn-danger" onclick="checkValue()" name="add-score"/>
+                    <input type="submit" value="Thêm" class="btn btn-danger" onclick="addScore()"
+                           id="btn-add-score"/>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
 <div class="spinner-grow text-primary my-spinner"></div>
 <ul class="list-group mt-2" id="comments"></ul>
 {% endblock %}
