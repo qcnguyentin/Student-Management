@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-
+{% if user_role == 1 %}
 
 <div class="container mt-1 tb-note">
     <h2>Thông tin chi tiết</h2>
@@ -148,6 +148,9 @@
 </div>
 <div class="spinner-grow text-primary my-spinner"></div>
 <ul class="list-group mt-2" id="comments"></ul>
+{% else %}
+<h1 class="text-center text-success">BẠN KHÔNG ĐƯỢC CẤP QUYỀN</h1>
+{% endif %}
 {% endblock %}
 {% block js %}
 <script src="{{ url_for('static', filename='js/score.js') }}"></script>

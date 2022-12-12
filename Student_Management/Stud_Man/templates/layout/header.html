@@ -25,12 +25,12 @@
                 <a class="dropdown-item" href="javascript:;" onclick="displayStatus()">Tìm lớp</a>
                 {% if user_role == 1 %}
                 <a class="dropdown-item" href="/score">quản lý điểm</a>
-                {% else %}
+                {% endif %}
+                {% if user_role == 2 or user_role == 3 %}
+                <a class="dropdown-item" href="/student">Quản lý học sinh</a>
+                {% endif %}
             </div>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">{{ user_role }}</a>
             </div>
-            {% endif %}
         </li>
         <li class="nav-item dropdown lf">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"

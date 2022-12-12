@@ -60,7 +60,7 @@ class MyClass(BaseModel):
 class Student(BaseModel):
     name = Column(String(50), nullable=False)
     sex = Column(String(20), nullable=False)
-    dob = Column(DateTime, nullable=False)
+    dob = Column(String, nullable=False)
     address = Column(String(100), nullable=False)
     email = Column(String(100))
     student_class = relationship('StudentClass', backref=backref('student'), lazy=True)
@@ -126,6 +126,7 @@ class UserSubject(BaseModel):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+
         # import hashlib
         #
         # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())

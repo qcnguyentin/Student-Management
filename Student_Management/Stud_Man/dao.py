@@ -6,12 +6,8 @@ from sqlalchemy import func
 import hashlib
 from Stud_Man.models import User, UserRole, MyClass, UserSubject, UserSemester, StudentSemester, Subject, \
     TeacherClass, Student, Semester, Regulation, StudentClass, Score
-import aspose.words as aw
+from datetime import datetime
 
-
-def export_html():
-    doc = aw.Document("templates/average.html")
-    doc.save("D:\html-to-pdf.pdf")
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
@@ -194,11 +190,52 @@ def save_score(student_id, score, type_score, class_name, semester, subject_name
 
 
 def score_average(year):
-    query = "SELECT my_class.name, score.score, semester.semester, semester.year, student.name, score.type_score, student.id FROM `std-mana`.my_class, `std-mana`.score, `std-mana`.semester, student WHERE my_class.id = score.class_id and score.semester_id = semester.id and score.student_id = student.id and semester.year = {}".format(year)
+    query = "SELECT my_class.name, score.score, semester.semester, semester.year, student.name, score.type_score, student.id, subject.name FROM `std-mana`.my_class, `std-mana`.score, `std-mana`.semester, student, subject WHERE my_class.id = score.class_id and score.semester_id = semester.id and score.student_id = student.id and subject.id = score.subject_id and semester.year = {}".format(year)
     df = db.session.execute(query).all()
     return df
 
 
+def student():
+    return Student.query.all()
+
+
+def add_student(student_name, student_sex, student_dob, student_address, student_email):
+    if student_name and student_sex and student_dob and student_address:
+        student = Student(name=student_name, sex=student_sex, dob=student_dob, address=student_address, email=student_email)
+        db.session.add(student)
+        db.session.commit()
+    return Student.query.all()
+
+
+def check_age(student_dob):
+    dt = datetime.strptime(student_dob, '%Y-%m-%d')
+    today = datetime.now()
+    age = today.year - dt.year
+    min_age = Regulation.query.filter(Regulation.type_regulation.__eq__("Tuôi tối thiểu")).all()
+    max_age = Regulation.query.filter(Regulation.type_regulation.__eq__("Tuôi tối đa")).all()
+    for s in min_age:
+        min_age = s.size
+    for s in max_age:
+        max_age = s.size
+    if min_age <= age <= max_age:
+        return True
+    return False
+
+
+def update_student(student_id, student_name, student_dob, student_address, student_mail):
+    std = Student.query
+    if student_id:
+        std = std.filter(Student.id.__eq__(student_id)).first()
+        std.name = student_name
+        std.dob = student_dob
+        std.address = student_address
+        std.mail = student_mail
+        db.session.add(std)
+        db.session.commit()
+        return True
+    return False
+
+
 if __name__ == '__main__':
     with app.app_context():
-        export_html()
+        print(check_age("2005-12-05"))

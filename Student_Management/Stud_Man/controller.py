@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import flask_login
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.sql.functions import current_user
@@ -38,7 +40,8 @@ def score_manage():
     else:
         class_name = ''
     print(class_name)
-    return render_template('score_manage.html', user_role=user_role, rep=rep, class_name=class_name, my_class=my_class, semester=semester)
+    return render_template('score_manage.html', user_role=user_role, rep=rep, class_name=class_name, my_class=my_class,
+                           semester=semester)
 
 
 def add_score(student_id):
@@ -154,20 +157,25 @@ def load_score_detail(student_id):
             'score': s.score,
             'type_score': s.type_score,
             'subject_name': s.subject.name,
-            'year': s.semester.semester,
+            'semester': s.semester.semester,
+            'year': s.semester.year,
             'student_id': s.student.id
         })
     return jsonify(data)
 
 
 def score_average():
+    user_role = check_user_role()
     class_name = request.args.get('class-name')
     year = request.args.get('year')
-    rep = dao.score_average(year)
-    data = utils.check_list(rep, class_name)
-    score = utils.cal_avg(data)
-    dao.export_html()
-    return render_template('average.html', score=score, year=year)
+    if year:
+        subject = dao.subject()
+        rep = dao.score_average(year)
+        data = utils.check_list(rep, class_name)
+        score = utils.cal_avg(data, subject)
+    else:
+        score = None
+    return render_template('average.html', score=score, year=year, user_role=user_role)
 
 
 def inform():
@@ -211,3 +219,126 @@ def login_my_user():
 
     user = current_user
     return index()
+
+
+def student():
+    user_role = check_user_role()
+    key = app.config['STUDENT']
+    student_session = session.get(key, {})
+    name = dao.student()
+    kw = request.args.get("keyword")
+    if not kw:
+        kw = ''
+    for i in name:
+        if str(kw) in i.name or kw == str(i.id):
+            if i.id not in student_session:
+                student_session[i.id] = {
+                    "student_id": i.id,
+                    "student_name": i.name,
+                    "student_sex": i.sex,
+                    "student_address": i.address,
+                    "student_dob": i.dob,
+                    "student_mail": i.email,
+                }
+    return render_template('student.html', user_role=user_role)
+
+
+def load_student():
+    pass
+
+
+def add_student():
+    student_info = request.json
+    student_name = student_info['student_name']
+    student_sex = student_info['student_sex']
+    student_dob = student_info['student_dob']
+    student_address = student_info['student_address']
+    student_email = student_info['student_email']
+    key = app.config['STUDENT']
+    student_session = session.get(key, {})
+    try:
+        if not student_name:
+            return jsonify({
+                'error': "Chưa nhập tên"
+            })
+        if not student_dob:
+            return jsonify({
+                'error': "Chưa chọn ngày sinh"
+            })
+        if not student_address:
+            return jsonify({
+                'error': "Chưa nhập địa chỉ"
+            })
+        if not dao.check_age(student_dob):
+            return jsonify({
+                'error': "Tuổi không hợp lệ"
+            })
+    except:
+        return jsonify({
+            'error': "Lỗi"
+        })
+    else:
+        name = dao.add_student(student_name=student_name, student_sex=student_sex, student_dob=student_dob,
+                               student_address=student_address, student_email=student_email)
+        if len(name) not in student_session:
+            student_session[len(name)] = {
+                "student_id": print(len(name)),
+                "student_name": student_name,
+                "student_sex": student_sex,
+                "student_address": student_address,
+                "student_dob": student_dob,
+                "student_mail": student_email,
+            }
+        return jsonify({
+            'error': "Thêm thành công"
+        })
+
+
+def update_student():
+    student_info = request.json
+    student_id = student_info['student_id']
+    student_name = student_info['student_name']
+    student_sex = student_info['student_sex']
+    student_dob = student_info['student_dob']
+    student_address = student_info['student_address']
+    student_email = student_info['student_email']
+    key = app.config['STUDENT']
+    student_session = session.get(key, {})
+    print(student_session)
+    try:
+        if not student_name:
+            return jsonify({
+                'error': "Chưa nhập tên"
+            })
+        if not student_dob:
+            return jsonify({
+                'error': "Chưa chọn ngày sinh"
+            })
+        if not student_address:
+            return jsonify({
+                'error': "Chưa nhập địa chỉ"
+            })
+        if not dao.check_age(student_dob):
+            return jsonify({
+                'error': "Tuổi không hợp lệ"
+            })
+    except:
+        return jsonify({
+            'error': "Lỗi server"
+        })
+    else:
+        check = dao.update_student(student_id=student_id, student_name=student_name, student_address=student_address, student_dob=student_dob, student_mail=student_email)
+        if int(student_id) == student_session:
+            student_session['student_name'] = student_name
+            student_session['student_address'] = student_address
+            student_session['student_dob'] = student_dob
+            student_session['student_mail'] = student_email
+        session[key] = student_session
+        if check:
+            return jsonify({
+                        'error': "Cập nhật thành công"
+                    })
+        else:
+            return jsonify({
+                'error': "Cập nhật không thành công"
+            })

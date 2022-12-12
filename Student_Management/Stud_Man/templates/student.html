@@ -1,0 +1,187 @@
+{% extends 'layout/base.html' %}
+{% block title %} Trang chủ {% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+{% endblock %}
+{% block content %}
+<hr/>
+<div style="width:200px; margin-left: 5em; margin-bottom:5px">
+    <div>
+        <div id="input-search-name">
+            <form class="d-flex" action="/student">
+                <input class="form-control me-2" name="keyword" type="text"
+                       placeholder="Nhập từ khóa...">
+                <button class="btn btn-secondary" type="submit">Tìm</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% if 'student' in session and session['student'] %}
+<div class="search-student" id="search-student-id">
+    <div>
+        {% if session['student'] %}
+        <table class="tb-notification tb-notification-student table-bordered table-hover">
+            <tr>
+                <th>Mã học sinh</th>
+                <th>Tên</th>
+                <th>Giới tính</th>
+                <th>Ngày sinh</th>
+                <th>Quê quán</th>
+                <th>Mail</th>
+                <th></th>
+            </tr>
+            {% for s in session['student'].values() %}
+            {% if s.student_id %}
+            <tr class="tb-notification-content" id="{{ s.student_id }}">
+                <td>{{ s.student_id }}</td>
+                <td>{{ s.student_name }}</td>
+                <td>{{ s.student_sex }}</td>
+                <td>{{ s.student_dob }}</td>
+                <td>{{ s.student_address }}</td>
+                <td>{{ s.student_mail }}</td>
+                <td>
+                    <div class="form-floating mb-3 full-width text-center">
+                        <input type="submit" value="Cập nhật" class="btn btn-danger" data-bs-toggle="modal"
+                               data-bs-target="#myModal-update{{s.student_id}}"
+                               id="btn-update-student{{ s.student_id }}"/>
+                        <div class="modal fade" id="myModal-update{{s.student_id}}">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Cập nhật thông tin học sinh</h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div style="display:none">
+                                        <input type="text" id="update-student-id"
+                                               value="{{ s.student_id }}">
+                                    </div>
+                                    <div>
+                                        <h5>Họ tên</h5>
+                                        <input type="text" id="update-student-name"
+                                               value="{{ s.student_name }}">
+                                    </div>
+                                    <div style="display:none">
+                                        <h5>Họ tên</h5>
+                                        <input type="text" id="update-student-sex"
+                                               value="{{ s.student_sex }}">
+                                    </div>
+                                    <div class="">
+                                        <form>
+                                            <h5>Ngày sinh</h5>
+                                            <input type="date" name="dob" id="update-student-dob" value="{{ s.student_dob }}">
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form>
+                                            <h5>Địa chỉ:</h5>
+                                            <input type="text" id="update-student-address"
+                                                   id="update-student-address" value="{{ s.student_address }}">
+                                        </form>
+                                    </div>
+                                    <div class="mb-3">
+                                        <form>
+                                            <h5>Email:</h5>
+                                            <input type="email" name="email" id="update-student-email" value="{{ s.student_mail }}">
+                                        </form>
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close
+                                        </button>
+                                        <div class="form-floating mt-3 mb-3 full-width">
+                                            <input class="btn btn-danger" id="btn-student-update" onclick="updateStudent()"
+                                                   type="submit" value="Cập nhật"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+
+        {% else %}
+        <h5 class="text-danger">Không tìm thấy học sinh phù hợp</h5>
+        {% endif %}
+    </div>
+</div>
+<div class="form-floating mb-3 full-width text-center">
+    <input type="submit" value="Thêm học sinh" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#myModal"
+           id="btn-add-student"/>
+</div>
+
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Thêm học sinh</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div id="add-score">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="form-floating mt-3 mb-3 input-score">
+                            <h5>Nhập họ tên</h5>
+                            <input type="text" id="add-student-name">
+                        </div>
+                        <div class="form-floating mt-2 ml-4" style="width: 200px">
+                            <form>
+                                <h5>Giới tính</h5>
+                                <select name="cars" class="custom-select" id="add-student-sex">
+                                    <option>Nam</option>
+                                    <option>Nữ</option>
+                                </select>
+                            </form>
+                        </div>
+
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Ngày sinh</h5>
+                                <input type="date" name="dob" id="add-student-dob">
+                            </form>
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Địa chỉ:</h5>
+                                <input type="text" id="add-student-address" id="add-student-address">
+                            </form>
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Email:</h5>
+                                <input type="email" name="email" id="add-student-email">
+                            </form>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                <div class="form-floating mt-3 mb-3 full-width">
+                    <input class="btn btn-danger" id="btn-add-score" onclick="addStudent()"
+                           type="submit" value="Thêm"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endif%}
+<script>
+  window.onload = function(){
+      loadStudent()
+    }
+</script>
+{% endblock %}

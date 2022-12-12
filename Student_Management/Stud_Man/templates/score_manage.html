@@ -3,7 +3,7 @@
 
 
 {% block content %}
-
+{% if user_role == 1 %}
 <h1 class="text-center text-success" style="padding-top: 0.5em;">Quản lý điểm</h1>
 <div id="search-class-score">
     <form class="d-flex" action="/score">
@@ -91,6 +91,9 @@
         </div>
     </div>
 </div>
+{% else %}
+<h1 class="text-center text-success">BẠN KHÔNG ĐƯỢC CẤP QUYỀN</h1>
+{% endif %}
 {% endblock %}
 {% block js %}
 <script src="{{ url_for('static', filename='js/score.js') }}"></script>
