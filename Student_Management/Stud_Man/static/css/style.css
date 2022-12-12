@@ -60,12 +60,12 @@ body {
 
 .tb-note {
   overflow: auto;
-  height: 28.5em;
+  height: 28em;
 }
 
 .sc-note {
   overflow: auto;
-  height: 16.5em;
+  height: 15.5em;
 }
 
 .sc-note table{

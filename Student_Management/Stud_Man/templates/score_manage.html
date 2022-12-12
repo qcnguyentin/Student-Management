@@ -7,8 +7,8 @@
 <h1 class="text-center text-success" style="padding-top: 0.5em;">Quản lý điểm</h1>
 <div id="search-class-score">
     <form class="d-flex" action="/score">
-        <input class="form-control me-2" name="keyword" type="text" placeholder="Nhập từ khóa...">
-        <button class="btn btn-secondary">Tìm</button>
+        <input class="form-control me-2" name="class-name" type="text" placeholder="Nhập từ khóa...">
+        <button class="btn btn-secondary" type="submit">Tìm</button>
     </form>
 </div>
 
@@ -23,160 +23,80 @@
             <th>Học kỳ</th>
             <th></th>
         </tr>
+        {% for s in rep %}
+        {% if class_name in s.my_class.name %}
+        <tr class="tb-notification-content" id="score${s.score_id}">
+            <td>{{ s.student.name }}</td>
+            <td>{{ s.type_score }}</td>
+            <td>{{ s.score }}</td>
+            <td>{{ s.my_class.name }}</td>
+            <td>{{ s.subject.name }}</td>
+            <td>Học kỳ {{ s.semester.semester }}, Năm {{ s.student.id }}</td>
+            <td>
+                <a href="/score/{{s.student.id}}">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                            data-bs-target="#myModal-detail">
+                        Xem chi tiết
+                    </button>
+                </a>
+            </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
     </table>
 </div>
-
-
-<div class="modal fade" id="myModal-update">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title">Sửa điểm</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <!-- Modal body -->
-      <div class="modal-body">
-        Modal body..
-      </div>
-
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-      </div>
-
-    </div>
-  </div>
+<div style="margin: 10px 0 0 5%">
+    <input type="submit" value="Xuất bảng điểm TB" class="btn btn-danger" id="btn-delete-score"
+           data-bs-toggle="modal" data-bs-target="#myModal-export"/>
 </div>
-
-<div class="modal fade" id="myModal-delete">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title">Bạn có chắc chắn muốn xóa</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger">Có</button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Không</button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<div style="margin-left:5%; padding-top:1em;">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
-        Thêm điểm
-    </button>
-</div>
-
-<div class="modal fade" id="myModal">
+<div class="modal fade" id="myModal-export">
     <div class="modal-dialog">
         <div class="modal-content">
 
             <!-- Modal Header -->
             <div class="modal-header">
-                <h4 class="modal-title">Thêm điểm</h4>
+                <h4 class="modal-title">Chọn lớp xuất điểm trung bình</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <!-- Modal body -->
             <div class="modal-body">
-                <div id="add-score">
-                    <form method="post" enctype="multipart/form-data">
-                        <div class="form-floating mt-3 mb-3 input-score">
-                            <h5>Nhập điểm</h5>
-                            <input type="text" id="add-score-score">
-                        </div>
-                        <div class="form-floating mb-3 mt-3 select-score input-score">
-                            <form>
-                                <h5>Chọn loại điểm</h5>
-                                <select name="cars" class="custom-select" id="add-score-type">
-                                    <option selected>Điểm 15p</option>
-                                    <option>Điểm 1 tiết</option>
-                                    <option>Điểm thi</option>
-                                </select>
-                            </form>
-                        </div>
-                        <div class="form-floating mb-3 mt-3 select-score">
-                            <form>
-                                <h5>Chọn học sinh</h5>
-                                <select name="cars" class="custom-select" id="add-score-student">
-                                    {% for a in student %}
-                                    <option>{{a.name}}</option>
+                <div class="form-floating mb-2 mt-1 select-score input-score">
+                    <div>
+                        <form class="d-block" action="/score/average">
+                            <div style="display:block">
+                                <h5>Chọn lớp</h5>
+                                <select name="class-name" class="custom-select" id="export-score-class">
+                                    {% for i in my_class %}
+                                    <option>{{ i.name }}</option>
                                     {% endfor %}
                                 </select>
-                            </form>
-                        </div>
-                        <div class="form-floating mb-3 mt-3 select-score">
-                            <form>
-                                <h5>Chọn môn học</h5>
-                                <select name="cars" class="custom-select" id="add-score-subject">
-                                    {% for a in subject %}
-                                    <option>{{a.name}}</option>
-                                    {% endfor %}
-                                </select>
-                            </form>
-                        </div>
-                        <div class="form-floating mb-3 mt-3 select-score">
-                            <form>
-                                <h5>Chọn lớp:</h5>
-                                <select name="cars" class="custom-select" id="add-score-class">
-                                    {% for a in my_class %}
-                                    <option>{{a}}</option>
-                                    {% endfor %}
-                                </select>
-                            </form>
-                        </div>
-                        <div class="form-floating mb-3 mt-3 select-score">
-                            <form>
-                                <h5>Chọn học kỳ:</h5>
-                                <select name="cars" class="custom-select" id="add-score-semester">
-                                    <option>1</option>
-                                    <option>2</option>
-                                </select>
-                            </form>
-                        </div>
-                        <div class="form-floating mb-3 mt-3 select-score">
-                            <form>
-                                <h5>Chọn năm học:</h5>
-                                <select name="cars" class="custom-select" id="add-score-year">
+                            </div>
+                            <div>
+                                <h5>Chọn năm học</h5>
+                                <select name="year" class="custom-select" id="export-score-year">
                                     {% for i in semester %}
                                     <option>{{ i.year }}</option>
                                     {% endfor %}
                                 </select>
-                            </form>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Modal footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                <div class="form-floating mt-3 mb-3 full-width">
-                    <input type="submit" value="Thêm" class="btn btn-danger" onclick="addScore()"
-                           id="btn-add-score"/>
+                            </div>
+                            <div class="mt-1">
+                                <a href="/score/average"><button class="btn btn-secondary" type="submit">Tìm</button></a>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<div class="spinner-grow text-primary my-spinner"></div>
-<ul class="list-group mt-2" id="comments"></ul>
 {% endblock %}
 {% block js %}
 <script src="{{ url_for('static', filename='js/score.js') }}"></script>
-<script>
-    window.onload = function() {
-        loadScores()
-    }
-</script>
+<!--<script>-->
+<!--    window.onload = function() {-->
+<!--        loadScores()-->
+<!--    }-->
+<!--</script>-->
 {% endblock %}

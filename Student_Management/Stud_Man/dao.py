@@ -1,11 +1,17 @@
 import hashlib
+from pymysql import *
 from Stud_Man import app, db
 from flask_login import current_user
 from sqlalchemy import func
 import hashlib
 from Stud_Man.models import User, UserRole, MyClass, UserSubject, UserSemester, StudentSemester, Subject, \
     TeacherClass, Student, Semester, Regulation, StudentClass, Score
+import aspose.words as aw
 
+
+def export_html():
+    doc = aw.Document("templates/average.html")
+    doc.save("D:\html-to-pdf.pdf")
 
 def get_user_by_id(user_id):
     return User.query.get(user_id)
@@ -36,10 +42,6 @@ def student_score():
     return Score.query.all()
 
 
-def student():
-    return Student.query.all()
-
-
 def subject():
     return Subject.query.all()
 
@@ -52,20 +54,42 @@ def my_class():
     return MyClass.query.all()
 
 
-def check_student_class_semester(student_name=None, class_name=None, semester=None, year=None):
-    query = db.session.query(Student.name, MyClass.name, Semester.semester, Semester.year, MyClass.id) \
+def check_student_class_semester(student_id=None, class_name=None, year=None):
+    query = db.session.query(Student.id, MyClass.name, Semester.semester, Semester.year, MyClass.id) \
         .join(StudentClass, Student.id.__eq__(StudentClass.student_id)) \
-        .join(MyClass, StudentClass.class_id.__eq__(MyClass.id)) \
-        .join(StudentSemester, Student.id.__eq__(StudentSemester.student_id)) \
-        .join(Semester, StudentSemester.semester_id.__eq__(Semester.id)).all()
+        .join(MyClass, StudentClass.class_id.__eq__(MyClass.id)).all()
     check = False
 
-    if student_name and class_name and semester and year:
+    if student_id and class_name and year:
         for s in query:
-            if s[0] == student_name and s[1] == class_name and s[2] == int(semester) and s[3] == int(year):
+            if s[0] == student_id and s[1] == class_name and s[3] == int(year):
                 check = True
     return check
 
+
+def delete_score(score_id):
+    score = Score.query
+
+    if score_id:
+        score = score.filter(Score.id.__eq__(score_id)).delete()
+        db.session.commit()
+        return True
+    return False
+
+
+def update_score(score_id, score_value):
+    score = Score.query
+    if score_id:
+        score = score.filter(Score.id.__eq__(score_id)).first()
+        score.score = float(score_value)
+        db.session.add(score)
+        db.session.commit()
+        return True
+    return False
+
+
+def get_student_by_id(student_id):
+    return Student.query.get(student_id)
 
 
 # tìm kiếm học sinh
@@ -75,7 +99,9 @@ def student_search(student_name=None, student_class=None, student_mshs=None):
         .join(StudentClass, Student.id.__eq__(StudentClass.student_id)) \
         .join(MyClass, StudentClass.class_id.__eq__(MyClass.id)) \
         .order_by(Student.id)
-
+    print(student_name)
+    print(student_mshs)
+    print(student_class)
     if student_name:
         query = query.filter(Student.name.contains(student_name))
 
@@ -154,8 +180,11 @@ def check_max_score(student_name, score, type_score, class_name, semester, subje
     return False
 
 
-def save_score(student_name, score, type_score, class_name, semester, subject_name, year):
-    score = check_max_score(student_name, score, type_score, class_name, semester, subject_name, year)
+def save_score(student_id, score, type_score, class_name, semester, subject_name, year):
+    query = Student.query.filter(Student.id.__eq__(student_id))
+    for i in query:
+        query = i.name
+    score = check_max_score(query, score, type_score, class_name, semester, subject_name, year)
     if score:
         print(score.student_id)
         db.session.add(score)
@@ -164,7 +193,12 @@ def save_score(student_name, score, type_score, class_name, semester, subject_na
     return "Lưu không thành công"
 
 
+def score_average(year):
+    query = "SELECT my_class.name, score.score, semester.semester, semester.year, student.name, score.type_score, student.id FROM `std-mana`.my_class, `std-mana`.score, `std-mana`.semester, student WHERE my_class.id = score.class_id and score.semester_id = semester.id and score.student_id = student.id and semester.year = {}".format(year)
+    df = db.session.execute(query).all()
+    return df
+
+
 if __name__ == '__main__':
     with app.app_context():
-        rep = check_student_class_semester("Đặng Thị S", "10A1", 2, 2022)
-        print(rep)
+        export_html()

@@ -8,9 +8,10 @@
         <button class="btn btn-secondary">Tìm</button>
     </form>
 </div>
-<h1 class="text-center text-success" style="padding-top: 0.5em;">TÌM THÔNG TIN HỌC SINH</h1>
+<h1 class="text-center text-success" style="padding-top: 0.5em;">HỌC SINH</h1>
 <div class="search-student" id="search-student-id">
     <div>
+        <h5 style="margin-left: 5em">Tìm kiếm học sinh:</h5>
         <select class="form-control" title="Nhấn để thay đổi phương thức tìm kiếm" onchange="SearchStudentBtn()">
             <option id="search-with-name">Tìm theo tên</option>
             <option id="search-with-class">Tìm theo lớp</option>
@@ -49,6 +50,7 @@
                 <th>Ngày sinh</th>
                 <th>Quê quán</th>
                 <th>Mail</th>
+                <th></th>
             </tr>
             {% for i in name %}
             {% if kw in i[2] %}
@@ -60,6 +62,13 @@
                 <td>{{ i[4] }}</td>
                 <td>{{ i[5] }}</td>
                 <td>{{ i[6] }}</td>
+                <td>
+                    <a href="/score/{{ i[0] }}">
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#myModal-detail">
+                            Xem điểm
+                        </button>
+                    </a>
+                </td>
             </tr>
             {% endif %}
             {% endfor %}

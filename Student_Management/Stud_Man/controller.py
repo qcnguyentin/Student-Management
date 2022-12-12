@@ -1,7 +1,6 @@
 import flask_login
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.sql.functions import current_user
-
 from Stud_Man import app, admin, login, controller, utils
 from flask import render_template, redirect, request, session, jsonify
 import dao
@@ -30,42 +29,20 @@ def search_student():
 
 def score_manage():
     user_role = check_user_role()
-    semester = dao.semester()
-    subject = dao.subject()
-    student = dao.student()
-    my_class = dao.my_class()
-
-    return render_template('score_manage.html', user_role=user_role, student=student,
-                           subject=subject, semester=semester, my_class=my_class)
-
-
-def load_score():
     rep = dao.student_score()
-    kw = request.args.get('keyword')
-    data = []
-    if kw:
-        kw = kw
+    my_class = dao.my_class()
+    semester = dao.semester()
+    class_name = request.args.get('class-name')
+    if class_name:
+        class_name = class_name
     else:
-        kw = ''
-
-    for s in rep:
-        if kw in s.student.name:
-            data.append({
-                'score_id': s.id,
-                'student_name': s.student.name,
-                'score': s.score,
-                'type_score': s.type_score,
-                'class_name': s.my_class.name,
-                'semester': s.semester.semester,
-                'subject_name': s.subject.name,
-                'year': s.semester.semester
-            })
-    return jsonify(data)
+        class_name = ''
+    print(class_name)
+    return render_template('score_manage.html', user_role=user_role, rep=rep, class_name=class_name, my_class=my_class, semester=semester)
 
 
-def add_score():
+def add_score(student_id):
     score_info = request.json
-    student_name = score_info['student_name']
     score = score_info['score']
     type_score = score_info['type_score']
     class_name = score_info['class_name']
@@ -75,13 +52,12 @@ def add_score():
     msg_ex = None
 
     try:
-        check = dao.check_student_class_semester(student_name=student_name, class_name=class_name, semester=semester, year=year)
-        print(check)
-        print(score)
-        if 0 <= int(score) <= 10:
+        check = dao.check_student_class_semester(student_id=int(student_id), class_name=class_name, year=year)
+        score = float(score)
+        if 0 <= score <= 10:
             print(msg_ex)
             if check:
-                dao.save_score(student_name, score, type_score, class_name, semester, subject_name, year)
+                dao.save_score(student_id, score, type_score, class_name, semester, subject_name, year)
                 msg_ex = 204
                 print(msg_ex)
             else:
@@ -94,20 +70,104 @@ def add_score():
             return jsonify({'status': 501})
         else:
             return jsonify({'status': 500})
-
     else:
         return jsonify({
             'status': msg_ex,
             'score': {
-                'student_name': student_name,
                 'score': score,
                 'type_score': type_score,
                 'class_name': class_name,
                 'semester': semester,
                 'subject_name': subject_name,
-                'year': year
+                'year': year,
+                'student_id': student_id
             }
         })
+
+
+def score_detail(student_id):
+    subject = dao.subject()
+    user_role = check_user_role()
+    std = dao.get_student_by_id(student_id=student_id)
+    return render_template('score_detail.html', student=std, user_role=user_role, subject=subject)
+
+
+def del_score(student_id):
+    score = request.json
+    score_id = 0
+    data = []
+    score_id = score['score_id']
+    test = dao.delete_score(int(score_id))
+    if test:
+        data.append({
+            'status': 204,
+            "score_id": score_id
+        })
+    else:
+        data.append({
+            'status': 500,
+
+        })
+
+    print(data)
+    return jsonify(data)
+
+
+def update_score(student_id):
+    score = request.json
+    score_id = 0
+    data = []
+    print(score)
+    score_id = score['score_id']
+    score_value = score['score_value']
+
+    test = dao.update_score(int(score_id), score_value)
+    score_value = float(score_value)
+    if 0 <= score_value <= 10:
+        if test:
+            data.append({
+                'status': 204,
+                "score_id": score_id,
+                "score_value": score_value
+            })
+    else:
+        data.append({
+            'status': 500
+        })
+    print(data)
+    return jsonify(data)
+
+
+def load_score_detail(student_id):
+    rep = dao.get_student_by_id(student_id=student_id)
+    data = []
+
+    print("rep")
+    print(rep)
+    print("rep")
+    print(rep.score)
+    for s in rep.score:
+        print(s)
+        print(s.id)
+        data.append({
+            'score_id': s.id,
+            'score': s.score,
+            'type_score': s.type_score,
+            'subject_name': s.subject.name,
+            'year': s.semester.semester,
+            'student_id': s.student.id
+        })
+    return jsonify(data)
+
+
+def score_average():
+    class_name = request.args.get('class-name')
+    year = request.args.get('year')
+    rep = dao.score_average(year)
+    data = utils.check_list(rep, class_name)
+    score = utils.cal_avg(data)
+    dao.export_html()
+    return render_template('average.html', score=score, year=year)
 
 
 def inform():
