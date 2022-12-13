@@ -1,0 +1,13 @@
+{% extends 'layout/base.html' %}
+{% block title %} Trang chủ {% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+{% endblock %}
+{% block content %}
+{% if user_role == 2 or user_role == 3 %}
+<h1>XIN CHÀO</h1>
+{% else %}
+<h1 class="text-center text-success">BẠN KHÔNG ĐƯỢC CẤP QUYỀN</h1>
+{% endif %}
+{% endblock %}

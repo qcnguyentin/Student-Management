@@ -5,6 +5,7 @@
 <script src="{{ url_for('static', filename='js/student.js') }}"></script>
 {% endblock %}
 {% block content %}
+{% if user_role == 2 or user_role == 3 %}
 <hr/>
 <div style="width:200px; margin-left: 5em; margin-bottom:5px">
     <div>
@@ -178,10 +179,8 @@
         </div>
     </div>
 </div>
-{%endif%}
-<script>
-  window.onload = function(){
-      loadStudent()
-    }
-</script>
+{% endif %}
+{% else %}
+<h1 class="text-center text-success">BẠN KHÔNG ĐƯỢC CẤP QUYỀN</h1>
+{% endif %}
 {% endblock %}

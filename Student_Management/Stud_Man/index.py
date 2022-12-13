@@ -17,9 +17,9 @@ app.add_url_rule('/api/score/<student_id>/score-list', 'update-score', controlle
 app.add_url_rule('/api/score/<student_id>/score-list', 'delete-cart', controller.del_score, methods=['delete'])
 app.add_url_rule('/api/score/<student_id>/score-list', 'score-detail-load', controller.load_score_detail)
 app.add_url_rule('/student', 'student', controller.student)
-app.add_url_rule('/api/student', 'student-load', controller.load_student)
 app.add_url_rule('/api/student/add-student', 'add-student', controller.add_student, methods=['post'])
 app.add_url_rule('/api/student/add-student', 'update-student', controller.update_student, methods=['update'])
+app.add_url_rule('/build-class', 'class-list', controller.class_list)
 
 @login.user_loader
 def load_user(user_id):

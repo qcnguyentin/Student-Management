@@ -243,10 +243,6 @@ def student():
     return render_template('student.html', user_role=user_role)
 
 
-def load_student():
-    pass
-
-
 def add_student():
     student_info = request.json
     student_name = student_info['student_name']
@@ -342,3 +338,8 @@ def update_student():
             return jsonify({
                 'error': "Cập nhật không thành công"
             })
+
+
+def class_list():
+    user_role = check_user_role()
+    return render_template('build_class.html', user_role=user_role)
