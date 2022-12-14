@@ -1,0 +1,108 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+{% if current_user.is_authenticated %}
+<h1 class="text-center text-success">THỐNG KÊ - BÁO CÁO</h1>
+<div class="col-md-7 col-sm-12">
+    <form class="d-flex">
+        <div class="form-group ml-3 d-flex">
+            <h5 class="mr-2">Chọn môn học</h5>
+            <select name="subject" id="stats-subject-name">
+                {% for i in subject %}
+                <option>{{i.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group ml-3 d-flex">
+            <h5 class="mr-2">Chọn học kỳ</h5>
+            <select name="semester" id="stats-semester">
+                <option>1</option>
+                <option>2</option>
+            </select>
+
+        </div>
+        <div>
+            <input type="submit" value="Lọc dữ liệu" class="btn btn-info ml-3" onclick="insertSjName()"/>
+        </div>
+    </form>
+</div>
+<div class="row" id="get_download">
+    <div class="col-md-5 col-sm-12">
+        <h3>BÁO CÁO TỔNG KẾT MÔN HỌC</h3>
+        <table class="table">
+            <tr>
+                <th colspan="5">Môn học: <span id="text-subject"></span></th>
+            </tr>
+            <tr>
+                <th colspan="5">Học kỳ: <span id="text-semester"></span></th>
+            </tr>
+            <tr>
+                <th colspan="5">Năm: 2022</th>
+            </tr>
+            <th>STT</th>
+            <th>Lớp</th>
+            <th>Sĩ số</th>
+            <th>Số lượng đạt</th>
+            <th>Tỷ lệ</th>
+            </tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{ s['stt'] }}</td>
+                <td>{{ s['pass'].class_name }}</td>
+                <td>{{ s['pass'].size_of_class }}</td>
+                <td>{{ s['pass'].pass_sj }}</td>
+                <td>{{ s['pass'].percent }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-sm-12">
+        <canvas id="classPassStats"></canvas>
+    </div>
+</div>
+
+<div class="mt-5 ml-3">
+    <button type="button" id="download-pdf" class="btn btn-danger" style="position: fixed; bottom:10%; right:10%">Xuất báo cáo</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/my_chart.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.8.0/html2pdf.bundle.js"
+        integrity="sha512-VqCeCECsaE2fYTxvPQk+OJ7+SQxzI1xZ6IqxuWd0GPKaJoeSFqeakVqNpMbx1AArieciBF71poL0dYTMiNgVxA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    let data = []
+    let labels = []
+    {% for s in stats %}
+        labels.push('{{ s['pass'].class_name }}')
+        data.push({{ s['pass'].percent }})
+    {% endfor %}
+    window.onload = function() {
+        drawClassPassStats(labels, data)
+        insertSjName()
+        document.getElementById("download-pdf").addEventListener("click",()=>{
+            var get_download = this.document.getElementById("get_download");
+            console.log(get_download);
+            console.log(window);
+            html2pdf(get_download);
+          })
+    }
+
+
+
+</script>
+{% else %}
+
+<h1 class="text-info text-center">ĐĂNG NHẬP NGƯỜI QUẢN TRỊ</h1>
+<form method="post" action="/admin-login">
+    <div class="form-group">
+        <label for="username">Tài khoản:</label>
+        <input type="text" class="form-control" placeholder="Tên tài khoản" name="username" id="username">
+    </div>
+    <div class="form-group">
+        <label for="password">Mật khẩu:</label>
+        <input type="password" class="form-control" placeholder="Nhập mật khẩu" name="password" id="password">
+    </div>
+    <button type="submit" class="btn btn-primary">Đăng nhập</button>
+</form>
+{% endif %}
+{% endblock %}

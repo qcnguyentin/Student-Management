@@ -3,22 +3,56 @@
 
 {% block js %}
 <script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script>
+    window.onload = function() {
+        loadStudent()
+    }
+
+
+</script>
 {% endblock %}
 {% block content %}
 {% if user_role == 2 or user_role == 3 %}
 <hr/>
-<div style="width:200px; margin-left: 5em; margin-bottom:5px">
+{% if 'student' in session and session['student'] %}
+<div class="search-student">
     <div>
+        <h5 style="margin-left: 5em">Tìm kiếm học sinh:</h5>
+        <select class="form-control" title="Nhấn để thay đổi phương thức tìm kiếm" id="search-selected"
+                onchange="SearchStudentBtn()">
+            <option id="search-with-name">Tìm theo tên</option>
+            <option>Tìm theo MSHS</option>
+            <div style="display:none"></div>
+        </select>
         <div id="input-search-name">
             <form class="d-flex" action="/student">
-                <input class="form-control me-2" name="keyword" type="text"
-                       placeholder="Nhập từ khóa...">
+                <input class="form-control me-2" name="student-name" type="text"
+                       placeholder="Nhập tên...">
+                <button class="btn btn-secondary" type="submit">Tìm</button>
+            </form>
+        </div>
+        <div id="input-search-class">
+            <div class="display:none !important">
+                <form class="d-flex" action="/student">
+                    <input class="form-control me-2" name="student-class" type="text"
+                           placeholder="Nhập lớp...">
+                    <button class="btn btn-secondary" type="submit">Tìm</button>
+                </form>
+            </div>
+        </div>
+        <div id="input-search-MSHS">
+            <form class="d-flex" action="/student">
+                <input class="form-control me-2" name="student-mshs" type="text"
+                       placeholder="Nhập mshs...">
                 <button class="btn btn-secondary" type="submit">Tìm</button>
             </form>
         </div>
     </div>
+    <div style="width:0; height:0">
+        <table class="tb-notification tb-notification-student table-bordered table-hover" >
+        </table>
+    </div>
 </div>
-{% if 'student' in session and session['student'] %}
 <div class="search-student" id="search-student-id">
     <div>
         {% if session['student'] %}
@@ -29,17 +63,20 @@
                 <th>Giới tính</th>
                 <th>Ngày sinh</th>
                 <th>Quê quán</th>
+                <th>Số điện thoại</th>
                 <th>Mail</th>
                 <th></th>
             </tr>
             {% for s in session['student'].values() %}
             {% if s.student_id %}
+            {% if student_name in s.student_name or student_mshs == s.student_id %}
             <tr class="tb-notification-content" id="{{ s.student_id }}">
                 <td>{{ s.student_id }}</td>
                 <td>{{ s.student_name }}</td>
                 <td>{{ s.student_sex }}</td>
                 <td>{{ s.student_dob }}</td>
                 <td>{{ s.student_address }}</td>
+                <td>{{ s.student_phone }}</td>
                 <td>{{ s.student_mail }}</td>
                 <td>
                     <div class="form-floating mb-3 full-width text-center">
@@ -65,14 +102,16 @@
                                                value="{{ s.student_name }}">
                                     </div>
                                     <div style="display:none">
-                                        <h5>Họ tên</h5>
+                                        <h5>Giới tính</h5>
                                         <input type="text" id="update-student-sex"
                                                value="{{ s.student_sex }}">
                                     </div>
+
                                     <div class="">
                                         <form>
                                             <h5>Ngày sinh</h5>
-                                            <input type="date" name="dob" id="update-student-dob" value="{{ s.student_dob }}">
+                                            <input type="date" name="dob" id="update-student-dob"
+                                                   value="{{ s.student_dob }}">
                                         </form>
                                     </div>
                                     <div>
@@ -82,10 +121,16 @@
                                                    id="update-student-address" value="{{ s.student_address }}">
                                         </form>
                                     </div>
+                                    <div>
+                                        <h5>Số điện thoại</h5>
+                                        <input type="text" id="update-student-phone"
+                                               value="{{ s.student_phone }}">
+                                    </div>
                                     <div class="mb-3">
                                         <form>
                                             <h5>Email:</h5>
-                                            <input type="email" name="email" id="update-student-email" value="{{ s.student_mail }}">
+                                            <input type="email" name="email" id="update-student-email"
+                                                   value="{{ s.student_mail }}">
                                         </form>
                                     </div>
 
@@ -94,7 +139,8 @@
                                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close
                                         </button>
                                         <div class="form-floating mt-3 mb-3 full-width">
-                                            <input class="btn btn-danger" id="btn-student-update" onclick="updateStudent()"
+                                            <input class="btn btn-danger" id="btn-student-update"
+                                                   onclick="updateStudent()"
                                                    type="submit" value="Cập nhật"/>
                                         </div>
                                     </div>
@@ -105,6 +151,7 @@
                     </div>
                 </td>
             </tr>
+            {% endif %}
             {% endif %}
             {% endfor %}
         </table>
@@ -156,7 +203,13 @@
                         <div class="form-floating mb-3 mt-3 select-score">
                             <form>
                                 <h5>Địa chỉ:</h5>
-                                <input type="text" id="add-student-address" id="add-student-address">
+                                <input type="text" id="add-student-address">
+                            </form>
+                        </div>
+                        <div class="form-floating mb-3 mt-3 select-score">
+                            <form>
+                                <h5>Số điện thoại</h5>
+                                <input type="text" id="add-student-phone">
                             </form>
                         </div>
                         <div class="form-floating mb-3 mt-3 select-score">

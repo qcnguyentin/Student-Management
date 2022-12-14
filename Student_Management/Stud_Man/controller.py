@@ -11,8 +11,12 @@ from Stud_Man.utils import *
 
 
 def index():
-    user_role = check_user_role()
-    rep = dao.teach_class(kw=request.args.get('keyword'))
+    if current_user.is_authenticated:
+        user_role = check_user_role()
+    else:
+        user_role = None
+    kw = request.args.get('keyword')
+    rep = dao.teach_class(kw)
     return render_template('index.html', rep=rep, user_role=user_role)
 
 
@@ -39,7 +43,6 @@ def score_manage():
         class_name = class_name
     else:
         class_name = ''
-    print(class_name)
     return render_template('score_manage.html', user_role=user_role, rep=rep, class_name=class_name, my_class=my_class,
                            semester=semester)
 
@@ -57,12 +60,10 @@ def add_score(student_id):
     try:
         check = dao.check_student_class_semester(student_id=int(student_id), class_name=class_name, year=year)
         score = float(score)
-        if 0 <= score <= 10:
-            print(msg_ex)
+        if 0 <= float(score) <= 10:
             if check:
                 dao.save_score(student_id, score, type_score, class_name, semester, subject_name, year)
                 msg_ex = 204
-                print(msg_ex)
             else:
                 msg_ex = 502
         else:
@@ -100,7 +101,7 @@ def del_score(student_id):
     score_id = 0
     data = []
     score_id = score['score_id']
-    test = dao.delete_score(int(score_id))
+    test = dao.delete_score(score_id)
     if test:
         data.append({
             'status': 204,
@@ -112,7 +113,6 @@ def del_score(student_id):
 
         })
 
-    print(data)
     return jsonify(data)
 
 
@@ -120,7 +120,7 @@ def update_score(student_id):
     score = request.json
     score_id = 0
     data = []
-    print(score)
+
     score_id = score['score_id']
     score_value = score['score_value']
 
@@ -137,7 +137,6 @@ def update_score(student_id):
         data.append({
             'status': 500
         })
-    print(data)
     return jsonify(data)
 
 
@@ -145,13 +144,7 @@ def load_score_detail(student_id):
     rep = dao.get_student_by_id(student_id=student_id)
     data = []
 
-    print("rep")
-    print(rep)
-    print("rep")
-    print(rep.score)
     for s in rep.score:
-        print(s)
-        print(s.id)
         data.append({
             'score_id': s.id,
             'score': s.score,
@@ -225,22 +218,30 @@ def student():
     user_role = check_user_role()
     key = app.config['STUDENT']
     student_session = session.get(key, {})
+    student_name = request.args.get("student-name")
+    student_mshs = request.args.get("student-mshs")
+    if not student_name:
+        student_name = ''
+    print(type(student_mshs))
     name = dao.student()
-    kw = request.args.get("keyword")
-    if not kw:
-        kw = ''
+    student_id_key = []
+    key = app.config['STUDENT']
     for i in name:
-        if str(kw) in i.name or kw == str(i.id):
-            if i.id not in student_session:
-                student_session[i.id] = {
-                    "student_id": i.id,
-                    "student_name": i.name,
-                    "student_sex": i.sex,
-                    "student_address": i.address,
-                    "student_dob": i.dob,
-                    "student_mail": i.email,
-                }
-    return render_template('student.html', user_role=user_role)
+        student_id_key.append(i.id)
+        if str(i.id) in student_session:
+            break
+        else:
+            student_session[str(i.id)] = {
+                "student_id": str(i.id),
+                "student_name": i.name,
+                "student_sex": i.sex,
+                "student_address": i.address,
+                "student_phone": i.phone,
+                "student_dob": i.dob,
+                "student_mail": i.email,
+            }
+            session[key] = student_session
+    return render_template('student.html', user_role=user_role, student_name=student_name, student_mshs=student_mshs)
 
 
 def add_student():
@@ -249,6 +250,7 @@ def add_student():
     student_sex = student_info['student_sex']
     student_dob = student_info['student_dob']
     student_address = student_info['student_address']
+    student_phone = student_info['student_phone']
     student_email = student_info['student_email']
     key = app.config['STUDENT']
     student_session = session.get(key, {})
@@ -275,16 +277,18 @@ def add_student():
         })
     else:
         name = dao.add_student(student_name=student_name, student_sex=student_sex, student_dob=student_dob,
-                               student_address=student_address, student_email=student_email)
-        if len(name) not in student_session:
-            student_session[len(name)] = {
-                "student_id": print(len(name)),
+                               student_address=student_address, student_email=student_email, student_phone=student_phone)
+        if str(len(name)) not in student_session:
+            student_session[str(len(name))] = {
+                "student_id": str(len(name)),
                 "student_name": student_name,
                 "student_sex": student_sex,
                 "student_address": student_address,
+                "student_phone": student_phone,
                 "student_dob": student_dob,
                 "student_mail": student_email,
             }
+            session[key] = student_session
         return jsonify({
             'error': "Thêm thành công"
         })
@@ -297,10 +301,10 @@ def update_student():
     student_sex = student_info['student_sex']
     student_dob = student_info['student_dob']
     student_address = student_info['student_address']
+    student_phone = student_info['student_phone']
     student_email = student_info['student_email']
     key = app.config['STUDENT']
     student_session = session.get(key, {})
-    print(student_session)
     try:
         if not student_name:
             return jsonify({
@@ -323,23 +327,38 @@ def update_student():
             'error': "Lỗi server"
         })
     else:
-        check = dao.update_student(student_id=student_id, student_name=student_name, student_address=student_address, student_dob=student_dob, student_mail=student_email)
-        if int(student_id) == student_session:
+        check = dao.update_student(student_id=student_id, student_name=student_name, student_address=student_address,
+                                   student_dob=student_dob, student_mail=student_email, student_phone=student_phone)
+        if student_id in student_session:
             student_session['student_name'] = student_name
             student_session['student_address'] = student_address
             student_session['student_dob'] = student_dob
+            student_session['student_phone'] = student_phone
+            print(student_session[student_id]['student_address'])
             student_session['student_mail'] = student_email
-        session[key] = student_session
-        if check:
-            return jsonify({
-                        'error': "Cập nhật thành công"
-                    })
+            if check:
+                return jsonify({
+                    'error': "Cập nhật thành công"
+                })
         else:
             return jsonify({
                 'error': "Cập nhật không thành công"
             })
 
 
-def class_list():
+def build_class():
+    kw = request.args.get('keyword')
+    student_name = request.args.get('student-name')
+    student_mshs = request.args.get('student-mshs')
+    class_of_student = dao.my_class()
+    student_list = dao.student_search_to_list()
+    if kw:
+        kw = kw
+    else:
+        kw = ''
     user_role = check_user_role()
-    return render_template('build_class.html', user_role=user_role)
+    return render_template('build_class.html', user_role=user_role, )
+
+
+def add_student_list():
+    return None

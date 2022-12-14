@@ -10,26 +10,27 @@ function displayStatus(){
 };
 
 function SearchStudentBtn(){
-  let search_with_name = document.getElementById("search-with-name");
-  let search_with_class = document.getElementById("search-with-class");
-  let search_with_MSHS = document.getElementById("search-with-MSHS");
+  let search_selected = document.getElementById("search-selected").value;
   let input_search_name = document.getElementById("input-search-name");
   let input_search_class = document.getElementById("input-search-class");
   let input_search_MSHS = document.getElementById("input-search-MSHS");
-  if ( search_with_name.selected == true ){
+  let a = 'Tìm theo tên'
+  let b = 'Tìm theo MSHS'
+  let c = 'Tìm theo lớp'
+  if ( document.getElementById("search-selected").value >= a ){
     //If the div is hidden, show it
     input_search_name.style.display = 'block';
     input_search_class.style.display = 'none';
     input_search_MSHS.style.display = 'none';
-  } else if ( search_with_class.selected == true ) {
+  } else if ( document.getElementById("search-selected").value <= b ) {
     //If the div is shown, hide it
-    input_search_name.style.display = 'none';
-    input_search_class.style.display = 'block';
-    input_search_MSHS.style.display = 'none';
-  }
-  else {
     input_search_name.style.display = 'none';
     input_search_class.style.display = 'none';
     input_search_MSHS.style.display = 'block';
+  }
+  else {
+    input_search_name.style.display = 'none';
+    input_search_class.style.display = 'block';
+    input_search_MSHS.style.display = 'none';
   }
 };

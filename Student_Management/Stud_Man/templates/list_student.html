@@ -1,0 +1,51 @@
+{% extends 'layout/base.html' %}
+{% block title %} Trang chủ {% endblock %}
+
+{% block content %}
+{% if user_role == 1 %}
+<h1 class="text-center">Bảng điểm trung bình</h1>
+<div class="container mt-3" id="get_download">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th colspan="5" class="text-center">BẢNG ĐIỂM MÔN HỌC</th>
+      </tr>
+      <tr>
+        <th colspan="5">Năm học: {{ year }}</th>
+      </tr>
+      <tr>
+        <th>STT</th>
+        <th>Họ Tên</th>
+        <th>Lớp</th>
+        <th>Điểm TB HK1</th>
+        <th>Điểm TB HK2</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in score %}
+      <tr>
+        <td>{{ i.stt }}</td>
+        <td>{{ i.student_name }}</td>
+        <td>{{ i.student_class_name }}</td>
+        <td>{{ i.score_avg1 }}</td>
+        <td>{{ i.score_avg2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<button type="button" id="download-pdf" class="btn btn-danger" style="margin-left: 10%">Xuất PDF</button>
+<script>
+  window.onload = function(){
+      document.getElementById("download-pdf").addEventListener("click",()=>{
+        var get_download = this.document.getElementById("get_download");
+        console.log(get_download);
+        console.log(window);
+        html2pdf(get_download);
+      })
+    }
+</script>
+{% else %}
+<h1 class="text-center text-success">BẠN KHÔNG ĐƯỢC CẤP QUYỀN</h1>
+{% endif %}
+{% endblock %}

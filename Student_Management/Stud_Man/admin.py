@@ -1,4 +1,4 @@
-from Stud_Man import db, app, dao
+from Stud_Man import db, app, dao, utils
 from Stud_Man.models import Regulation, User, UserRole, Subject
 from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
@@ -42,8 +42,11 @@ class RegulationView(AuthenticatedModelView):
     can_view_details = True
     can_export = True
     # column_filters = ('id', 'user.name')
+    column_export_list = ['type_regulation', 'size']
+    column_exclude_list = ['user']
     column_labels = {
-        'user': 'Người chỉnh sửa'
+        'type_regulation': 'Loại quy định',
+        'size': 'Giá trị'
     }
     page_size = 6
     extra_js = ['//cdn.ckeditor.com/4.6.0/standard/ckeditor.js']
@@ -55,10 +58,9 @@ class RegulationView(AuthenticatedModelView):
 class SubjectView(AuthenticatedModelView):
     can_view_details = True
     can_export = True
-    # column_filters = ('content', 'id', 'user.name')
     column_labels = {
-        'score': 'Nội dung',
-        'user': 'Người chỉnh sửa'
+        'name': 'Tên môn học',
+        'user_subject': 'Người quản lý môn học'
     }
     page_size = 6
     extra_js = ['//cdn.ckeditor.com/4.6.0/standard/ckeditor.js']
@@ -67,8 +69,27 @@ class SubjectView(AuthenticatedModelView):
     }
 
 
+class StatsView(AuthenticatedView):
+    @expose('/')
+    def index(self):
+        subject = dao.subject()
+        kw = request.args.get('kw')
+        sj = request.args.get('subject')
+        sm = request.args.get('semester')
+        stats = dao.mutil_class_pass(kw, sj, sm)
+        print(stats)
+        return self.render('admin/stats.html', subject=subject, stats=stats)
 
-admin = Admin(app=app, name="Quan ly hoc sinh", template_mode="bootstrap4")
+
+class MyAdminView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        stats = dao.count_student_by_class()
+        return self.render('admin/index.html', stats=stats)
+
+
+admin = Admin(app=app, name="Quan ly hoc sinh", template_mode="bootstrap4", index_view=MyAdminView())
 admin.add_view(RegulationView(Regulation, db.session, name='Quy định'))
 admin.add_view(SubjectView(Subject, db.session, name='Môn học'))
+admin.add_view(StatsView(name='Thống kê'))
 admin.add_view(LogoutView(name='Đăng xuất'))

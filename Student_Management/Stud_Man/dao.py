@@ -1,6 +1,8 @@
 import hashlib
+
+from flask import jsonify
 from pymysql import *
-from Stud_Man import app, db
+from Stud_Man import app, db, utils
 from flask_login import current_user
 from sqlalchemy import func
 import hashlib
@@ -95,9 +97,6 @@ def student_search(student_name=None, student_class=None, student_mshs=None):
         .join(StudentClass, Student.id.__eq__(StudentClass.student_id)) \
         .join(MyClass, StudentClass.class_id.__eq__(MyClass.id)) \
         .order_by(Student.id)
-    print(student_name)
-    print(student_mshs)
-    print(student_class)
     if student_name:
         query = query.filter(Student.name.contains(student_name))
 
@@ -190,7 +189,8 @@ def save_score(student_id, score, type_score, class_name, semester, subject_name
 
 
 def score_average(year):
-    query = "SELECT my_class.name, score.score, semester.semester, semester.year, student.name, score.type_score, student.id, subject.name FROM `std-mana`.my_class, `std-mana`.score, `std-mana`.semester, student, subject WHERE my_class.id = score.class_id and score.semester_id = semester.id and score.student_id = student.id and subject.id = score.subject_id and semester.year = {}".format(year)
+    query = "SELECT my_class.name, score.score, semester.semester, semester.year, student.name, score.type_score, student.id, subject.name FROM `std-mana`.my_class, `std-mana`.score, `std-mana`.semester, student, subject WHERE my_class.id = score.class_id and score.semester_id = semester.id and score.student_id = student.id and subject.id = score.subject_id and semester.year = {}".format(
+        year)
     df = db.session.execute(query).all()
     return df
 
@@ -199,9 +199,10 @@ def student():
     return Student.query.all()
 
 
-def add_student(student_name, student_sex, student_dob, student_address, student_email):
+def add_student(student_name, student_sex, student_dob, student_address, student_email, student_phone):
     if student_name and student_sex and student_dob and student_address:
-        student = Student(name=student_name, sex=student_sex, dob=student_dob, address=student_address, email=student_email)
+        student = Student(name=student_name, sex=student_sex, dob=student_dob, address=student_address,
+                          phone=student_phone, email=student_email)
         db.session.add(student)
         db.session.commit()
     return Student.query.all()
@@ -222,13 +223,14 @@ def check_age(student_dob):
     return False
 
 
-def update_student(student_id, student_name, student_dob, student_address, student_mail):
+def update_student(student_id, student_name, student_dob, student_address, student_phone, student_mail):
     std = Student.query
     if student_id:
-        std = std.filter(Student.id.__eq__(student_id)).first()
+        std = std.filter(Student.id.__eq__(int(student_id))).first()
         std.name = student_name
         std.dob = student_dob
         std.address = student_address
+        std.phone = student_phone
         std.mail = student_mail
         db.session.add(std)
         db.session.commit()
@@ -236,6 +238,139 @@ def update_student(student_id, student_name, student_dob, student_address, stude
     return False
 
 
+#duyệt ds học sinh
+def student_search_to_list():
+    query = "SELECT * FROM student LEFT JOIN student_class ON student.id=student_class.student_id;"
+    df = db.session.execute(query).all()
+    return df
+
+
+#đếm sĩ số lớp
+def count_student_by_class():
+    query = "SELECT my_class.id, my_class.name, count(student.id), semester.year, semester.semester FROM student, my_class, student_class, student_semester, semester WHERE student.id = student_class.student_id and student_class.class_id = my_class.id and student.id = student_semester.student_id and student_semester.semester_id = semester.id group by my_class.id, semester.year, semester.semester order by my_class.id"
+    df = db.session.execute(query).all()
+    year = datetime.now().year
+    stats = []
+    for s in df:
+        if s[3] == year and s[4] == 1:
+            stats.append(s)
+    return stats
+
+
+#tính điểm trung bình 1 môn chỉ định
+def cal_avg_sj(data):
+    score = []
+    student_id_list = []
+    count = []
+    my_class = []
+    for s in data:
+        if s['class'] not in my_class:
+            my_class.append(s['class'])
+    for s in data:
+        if s['student_id'] not in student_id_list:
+            student_id_list.append(s['student_id'])
+            score.append(0)
+            count.append(0)
+    for s in range(len(student_id_list)):
+        for c in range(len(data)):
+            if data[c]['student_id'] == student_id_list[s] and data[c]['class'] == my_class[0]:
+                if data[c]['type_score'] == "Điểm 1 tiết":
+                    score[s] += 2 * data[c]['score']
+                    count[s] += 2
+                elif data[c]['type_score'] == "Điểm 15p":
+                    score[s] += data[c]['score']
+                    count[s] += 1
+                else:
+                    score[s] += 3 * data[c]['score']
+                    count[s] += 3
+    score_avg = []
+    for i in range(len(count)):
+        if count[i] == 0:
+            count[i] = 1
+    for i in range(len(score)):
+        score_avg.append(score[i]/count[i])
+    return score_avg
+
+
+#kiểm tra số lượng học sinh qua 1 môn chỉ định của 1 lớp
+def stats_pass_subject(kw=None, subject=None, semester=None, class_name=None):
+    std_cls = StudentClass.query.all()
+    sc = Score.query.all()
+    score_list = []
+    if not semester:
+        semester = 0
+    for s in sc:
+        for std in std_cls:
+            if s.student_id == std.student_id and s.semester.semester == int(semester) and s.subject.name == subject and s.my_class.name == class_name:
+                score_list.append({
+                    'student_id': s.student_id,
+                    'score': s.score,
+                    'type_score': s.type_score,
+                    'class': std.my_class.name
+                })
+                break
+    std_pass = []
+    score = cal_avg_sj(score_list)
+    student_id_list = []
+    status = []
+    size_of_class = 0
+    pass_sj = 0
+    for i in score:
+        if i >= 5:
+            status.append(True)
+        else:
+            status.append(False)
+    for s in score_list:
+        if s['student_id'] not in student_id_list and s['class'] == class_name:
+            student_id_list.append(s['student_id'])
+            size_of_class += 1
+            for j in sc:
+                for std in std_cls:
+                    if j.student_id == std.student_id and j.semester.semester == int(
+                            semester) and j.subject.name == subject and j.my_class.name == class_name:
+                        score_list.append({
+                            'student_id': j.student_id,
+                            'score': j.score,
+                            'type_score': j.type_score,
+                            'class': std.my_class.name
+                        })
+                        break
+    for i in range(len(student_id_list)):
+        std_pass.append({
+            "student_id": student_id_list[i],
+            "score_avg": score[i],
+            "status_pass": status[i],
+        })
+    for i in range(len(std_pass)):
+        if student_id_list[i] == std_pass[i]["student_id"]:
+            if std_pass[i]["status_pass"]:
+                pass_sj += 1
+    if size_of_class == 0:
+        size_of_class = 1
+    percent = pass_sj * 100/size_of_class
+    stt = 0
+    return {
+        'size_of_class': size_of_class,
+        'pass_sj': pass_sj,
+        'percent': round(percent, 2),
+        "class_name": class_name
+    }
+
+
+#kiểm tra số lượng học sinh qua 1 môn chỉ định của các lớp
+def mutil_class_pass(kw=None, subject=None, semester=None):
+    class_name = MyClass.query.all()
+    list = []
+    stt = 0
+    for s in class_name:
+        stt += 1
+        list.append({
+            'stt': stt,
+            'pass': stats_pass_subject(kw, subject, semester, s.name)
+        })
+    return list
+
+
 if __name__ == '__main__':
     with app.app_context():
-        print(check_age("2005-12-05"))
+        print(student_search_to_list())

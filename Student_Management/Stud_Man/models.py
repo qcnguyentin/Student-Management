@@ -44,7 +44,7 @@ class Regulation(BaseModel):
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
 
     # def __str__(self):
-    #     return self.user_id
+    #     return self.user_id.user.name
 
 
 class MyClass(BaseModel):
@@ -62,6 +62,7 @@ class Student(BaseModel):
     sex = Column(String(20), nullable=False)
     dob = Column(String, nullable=False)
     address = Column(String(100), nullable=False)
+    phone = Column(String(20))
     email = Column(String(100))
     student_class = relationship('StudentClass', backref=backref('student'), lazy=True)
     student_semester = relationship('StudentSemester', backref=backref('student'), lazy=True)

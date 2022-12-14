@@ -1,14 +1,43 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/master.html' %}
 
 {% block body %}
-<div id="search-class-id" style="display: none;">
-    <form class="d-flex" action="/?next=/score">
-        <input class="form-control me-2" name="keyword" type="text" placeholder="Nhập từ khóa...">
-        <button class="btn btn-secondary">Tìm</button>
-    </form>
-</div>
 {% if current_user.is_authenticated %}
 <h1 class="text-info text-center">Xin chào <span class="text-danger">{{ current_user.name }}</span></h1>
+<h3>Sĩ số các lớp năm nay</h3>
+<div class="row">
+    <div class="col-md-5 col-sm-12" style="overflow: auto; height: 400px">
+        <table class="table">
+            <tr>
+                <th>Tên lớp</th>
+                <th>Số lượng học sinh</th>
+                <th>Năm</th>
+            </tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{ s[1] }}</td>
+                <td>{{ s[2] }}</td>
+                <td>{{ s[3] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-sm-12">
+        <canvas id="classStats"></canvas>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/my_chart.js') }}"></script>
+<script>
+    let data = []
+    let labels = []
+    {% for s in stats %}
+        labels.push('{{ s[1] }}')
+        data.push({{ s[2] }})
+    {% endfor %}
+    window.onload = function() {
+        drawClassStats(labels, data)
+    }
+</script>
 {% else %}
 
 <h1 class="text-info text-center">ĐĂNG NHẬP NGƯỜI QUẢN TRỊ</h1>
@@ -24,5 +53,4 @@
     <button type="submit" class="btn btn-primary">Đăng nhập</button>
 </form>
 {% endif %}
-
 {% endblock %}

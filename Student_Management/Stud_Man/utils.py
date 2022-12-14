@@ -1,5 +1,7 @@
+from flask import session
 from flask_login import current_user
 
+from Stud_Man import app, dao
 from Stud_Man.models import UserRole
 
 
@@ -53,11 +55,10 @@ def cal_subject_sem(data, subj, student_id, sem):
             count[i] = 1
     score_avg_dv = []
     for i in range(len(subj)):
-        score_avg_dv.append(score_avg[i]/count[i])
+        score_avg_dv.append(score_avg[i] / count[i])
     return score_avg_dv
 
 
-#chưa hoàn thành, do tính điểm theo môn chưa hợp lệ
 def cal_avg(data, subj):
     stt = 0
     student_id = []
@@ -73,7 +74,6 @@ def cal_avg(data, subj):
             student_class_name.append(s['tb'][0])
             score_avg1.append(0)
             score_avg2.append(0)
-    print(score_avg1)
     subject_score_student = []
     id = 0
     for i in student_id:
@@ -85,7 +85,6 @@ def cal_avg(data, subj):
 
         id += 1
 
-    print(subject_score_student)
     for i in subj:
         count += 1
 
@@ -94,7 +93,6 @@ def cal_avg(data, subj):
             x = i['id']
             score_avg1[x] += i['avg_sm1'][j]
             score_avg2[x] += i['avg_sm2'][j]
-
 
     # danh sách mã học sinh, tên học sinh, lớp
 
@@ -114,3 +112,22 @@ def cal_avg(data, subj):
             'score_avg2': round(score_avg2[i], 1)
         })
     return score
+
+
+def check_pass_subject(data, subj, student_id, sem):
+    score_avg_subject = cal_subject_sem(data, subj, student_id, sem)
+    list_pass = []
+    for i in range(len(score_avg_subject)):
+        if score_avg_subject[i] > 5:
+            list_pass.append({
+                'subject_name': subj[i],
+                'status': True,
+                'score_value': score_avg_subject[i]
+            })
+        else:
+            list_pass.append({
+                'subject_name': subj[i],
+                'status': False,
+                'score_value': score_avg_subject[i]
+            })
+    return list_pass
