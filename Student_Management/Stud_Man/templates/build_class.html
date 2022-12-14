@@ -2,7 +2,7 @@
 {% block title %} Trang chủ {% endblock %}
 
 {% block js %}
-<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+<script src="{{ url_for('static', filename='js/list_studen.js') }}"></script>
 {% endblock %}
 {% block content %}
 {% if user_role == 2 or user_role == 3 %}
@@ -45,43 +45,48 @@
             </form>
         </div>
         <div id="open-list-student">
-            <form class="d-flex" action="/build-class">
-                <input class="form-control me-2 ml-5 btn btn-primary" name="student-mshs" type="button" value="Xem danh sách đã thêm">
-            </form>
+            <a href="/list-student" class="btn btn-primary ml-3">
+                Xem danh sách đã thêm <span class="badge bg-danger list-counter">{{ student_list.size_of_class }}</span>
+            </a>
+        </div>
+        <div id="update-class-student">
+            <a href="javascript:;" class="btn btn-primary ml-3" id="btn-update-class" style="display:none">
+                Cập nhật lớp
+            </a>
         </div>
     </div>
     <div>
-        {% if name %}
+        {% if student_list %}
         <table class="tb-notification tb-notification-student table-bordered table-hover">
             <tr>
-                <th>Mã học sinh</th>
+                <th>Mã</th>
                 <th>Tên</th>
-                <th>Lớp</th>
                 <th>Giới tính</th>
                 <th>Ngày sinh</th>
-                <th>Quê quán</th>
-                <th>Mail</th>
+                <th>SĐT</th>
+                <th>Đổi lớp</th>
                 <th></th>
             </tr>
-            {% for i in name %}
-            {% if kw in i[2] %}
+            {% for i in student_list %}
             <tr class="tb-notification-content">
-                <td>{{ i[0] }}</td>
-                <td>{{ i[1] }}</td>
-                <td>{{ i[2] }}</td>
-                <td>{{ i[3] }}</td>
-                <td>{{ i[4] }}</td>
-                <td>{{ i[5] }}</td>
-                <td>{{ i[6] }}</td>
+                <td>{{ i.id }}</td>
+                <td>{{ i.name }}</td>
+                <td>{{ i.sex }}</td>
+                <td>{{ i.dob }}</td>
+                <td>{{ i.phone }}</td>
                 <td>
-                    <a href="/student/{{ i[0] }}">
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#myModal-detail">
-                            Thêm vào danh sách
-                        </button>
+                    <select style="width:70px" class="update-class" onchange="changeClass()">
+                        {% for i in list_class %}
+                        <option>{{ i.name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <a href="javascript:;" class="btn btn-danger" onclick="addToList({{ i.id }}, '{{ i.name }}', '{{ i.sex }}', '{{ i.dob }}', '{{ i.address }}', '{{ i.phone }}', '{{ i.email }}')">
+                        Thêm vào danh sách
                     </a>
                 </td>
             </tr>
-            {% endif %}
             {% endfor %}
         </table>
         {% else %}

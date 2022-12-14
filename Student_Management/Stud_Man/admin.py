@@ -77,7 +77,6 @@ class StatsView(AuthenticatedView):
         sj = request.args.get('subject')
         sm = request.args.get('semester')
         stats = dao.mutil_class_pass(kw, sj, sm)
-        print(stats)
         return self.render('admin/stats.html', subject=subject, stats=stats)
 
 

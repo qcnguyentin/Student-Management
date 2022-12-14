@@ -5,6 +5,7 @@ from Stud_Man import app, dao
 from Stud_Man.models import UserRole
 
 
+#trả ra vai trò của user
 def check_user_role():
     if current_user.is_authenticated:
         if current_user.user_role == UserRole.TEACHER:
@@ -18,6 +19,7 @@ def check_user_role():
     return user_role
 
 
+#kiểm tra các giá trị điểm có thuộc lớp chỉ định
 def check_list(rep, class_name):
     data = []
     for i in rep:
@@ -32,6 +34,7 @@ def check_list(rep, class_name):
     return data
 
 
+#tính trung bình điểm của 1 học sinh trong các môn học
 def cal_subject_sem(data, subj, student_id, sem):
     score_avg = []
     count = []
@@ -59,6 +62,7 @@ def cal_subject_sem(data, subj, student_id, sem):
     return score_avg_dv
 
 
+#tính điểm trung bình của 2 học kỳ
 def cal_avg(data, subj):
     stt = 0
     student_id = []
@@ -114,20 +118,36 @@ def cal_avg(data, subj):
     return score
 
 
-def check_pass_subject(data, subj, student_id, sem):
-    score_avg_subject = cal_subject_sem(data, subj, student_id, sem)
-    list_pass = []
-    for i in range(len(score_avg_subject)):
-        if score_avg_subject[i] > 5:
-            list_pass.append({
-                'subject_name': subj[i],
-                'status': True,
-                'score_value': score_avg_subject[i]
-            })
-        else:
-            list_pass.append({
-                'subject_name': subj[i],
-                'status': False,
-                'score_value': score_avg_subject[i]
-            })
-    return list_pass
+#kiểm tra điểm của môn học có đạt không
+# def check_pass_subject(data, subj, student_id, sem):
+#     score_avg_subject = cal_subject_sem(data, subj, student_id, sem)
+#     list_pass = []
+#     for i in range(len(score_avg_subject)):
+#         if score_avg_subject[i] > 5:
+#             list_pass.append({
+#                 'subject_name': subj[i],
+#                 'status': True,
+#                 'score_value': score_avg_subject[i]
+#             })
+#         else:
+#             list_pass.append({
+#                 'subject_name': subj[i],
+#                 'status': False,
+#                 'score_value': score_avg_subject[i]
+#             })
+#     return list_pass
+
+
+def list_stats(student_list):
+    size_of_class = 0
+    max_size = dao.check_max_student()
+    if student_list:
+        for c in student_list.values():
+            size_of_class += c['size_of_class']
+            if size_of_class > max_size:
+                return{
+                    'size_of_class': "Số lượng vượt mức"
+                }
+    return {
+        'size_of_class': size_of_class
+    }

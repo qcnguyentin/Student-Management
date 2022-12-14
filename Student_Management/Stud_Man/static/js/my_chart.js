@@ -53,10 +53,11 @@ function drawClassPassStats(labels, data) {
 }
 
 function insertSjName() {
-    let a = document.getElementById("stats-subject-name").value
-    let c = document.getElementById("stats-semester").value
+    let a = document.getElementById("stats-subject-name")
+    let c = document.getElementById("stats-semester")
     let b = document.getElementById("text-subject")
     let d = document.getElementById("text-semester")
-    b.innerHTML = a
-    d.innerHTML = c
+    b.innerHTML = a.value
+    d.innerHTML = c.value
 }
+

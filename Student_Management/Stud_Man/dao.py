@@ -11,19 +11,20 @@ from Stud_Man.models import User, UserRole, MyClass, UserSubject, UserSemester, 
 from datetime import datetime
 
 
+#lấy user bằng id
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 
 
+#xác thực user
 def auth_user(username, password):
     password = str(hashlib.md5(password.encode('utf-8')).hexdigest())
     return User.query.filter(User.username.__eq__(username.strip()),
                              User.password.__eq__(password)).first()
 
-    # lấy ngày phụ trách, tên lớp, sĩ số (class, teacher_class)
-    # lấy tên giáo viên
-
-
+# lấy ngày phụ trách, tên lớp, sĩ số (class, teacher_class)
+# lấy tên giáo viên
+#lấy ra các giá trị để hiện thông tin giáo viên nhận lớp nào thời gian nào
 def teach_class(kw=None):
     query = db.session.query(MyClass.name, User.name, TeacherClass.date) \
         .join(MyClass, TeacherClass.class_id.__eq__(MyClass.id)) \
@@ -36,22 +37,27 @@ def teach_class(kw=None):
     return query.all()
 
 
+#lấy danh sách điểm
 def student_score():
     return Score.query.all()
 
 
+#lấy danh sách môn học
 def subject():
     return Subject.query.all()
 
 
+#lấy danh sách học kỳ
 def semester():
     return Semester.query.group_by(Semester.year).all()
 
 
+#lấy danh sách lớp
 def my_class():
     return MyClass.query.all()
 
 
+#kiểm tra học sinh có học lớp chỉ định và có học trong học kỳ đó không để thêm điểm
 def check_student_class_semester(student_id=None, class_name=None, year=None):
     query = db.session.query(Student.id, MyClass.name, Semester.semester, Semester.year, MyClass.id) \
         .join(StudentClass, Student.id.__eq__(StudentClass.student_id)) \
@@ -65,6 +71,7 @@ def check_student_class_semester(student_id=None, class_name=None, year=None):
     return check
 
 
+#xóa điểm
 def delete_score(score_id):
     score = Score.query
 
@@ -75,6 +82,7 @@ def delete_score(score_id):
     return False
 
 
+#cập nhật điểm
 def update_score(score_id, score_value):
     score = Score.query
     if score_id:
@@ -86,6 +94,7 @@ def update_score(score_id, score_value):
     return False
 
 
+#lấy học sinh từ id
 def get_student_by_id(student_id):
     return Student.query.get(student_id)
 
@@ -105,11 +114,11 @@ def student_search(student_name=None, student_class=None, student_mshs=None):
 
     if student_mshs:
         query = query.filter(Student.id.contains(student_mshs))
-        print(query)
 
     return query.all()
 
 
+#lấy danh sách học sinh
 def load_class(class_id=None, kw=None):
     query = MyClass.query
 
@@ -122,6 +131,7 @@ def load_class(class_id=None, kw=None):
     return query.all()
 
 
+#kiểm tra điểm thuộc loại nào của học sinh nào học kỳ nào đã vượt số lượng cho phép chưa để thêm điểm
 def check_max_score(student_name, score, type_score, class_name, semester, subject_name, year):
     # lấy dữ liệu so sánh với điểm cần thêm
     student_name = Student.query.filter(Student.name.__eq__(student_name)).all()
@@ -153,7 +163,6 @@ def check_max_score(student_name, score, type_score, class_name, semester, subje
     # biến để đếm số lượng các điểm đã vượt mức chưa
     score_student = Score.query.filter(Score.student_id.__eq__(stud_id)).filter(Score.class_id.__eq__(class_id)).filter(
         Score.semester_id.__eq__(semester_id)).filter(Score.subject_id.__eq__(subject_id)).all()
-    print(score_student)
     count_max_score = 0
     # bảng relugation có lưu giá trị quy định điểm tối đa
     max_15m = Regulation.query.filter(Regulation.type_regulation.__eq__("Số điểm 15p")).all()
@@ -175,19 +184,20 @@ def check_max_score(student_name, score, type_score, class_name, semester, subje
     return False
 
 
+#lưu điểm sau khi thêm
 def save_score(student_id, score, type_score, class_name, semester, subject_name, year):
     query = Student.query.filter(Student.id.__eq__(student_id))
     for i in query:
         query = i.name
     score = check_max_score(query, score, type_score, class_name, semester, subject_name, year)
     if score:
-        print(score.student_id)
         db.session.add(score)
         db.session.commit()
         return score
     return "Lưu không thành công"
 
 
+#lấy các giá trị để tính trung bình trong năm học để xuất bảng điểm
 def score_average(year):
     query = "SELECT my_class.name, score.score, semester.semester, semester.year, student.name, score.type_score, student.id, subject.name FROM `std-mana`.my_class, `std-mana`.score, `std-mana`.semester, student, subject WHERE my_class.id = score.class_id and score.semester_id = semester.id and score.student_id = student.id and subject.id = score.subject_id and semester.year = {}".format(
         year)
@@ -195,10 +205,12 @@ def score_average(year):
     return df
 
 
+#lấy học sinh
 def student():
     return Student.query.all()
 
 
+#thêm học sinh
 def add_student(student_name, student_sex, student_dob, student_address, student_email, student_phone):
     if student_name and student_sex and student_dob and student_address:
         student = Student(name=student_name, sex=student_sex, dob=student_dob, address=student_address,
@@ -208,6 +220,7 @@ def add_student(student_name, student_sex, student_dob, student_address, student
     return Student.query.all()
 
 
+#kiểm tra độ tuổi có đúng quy định không
 def check_age(student_dob):
     dt = datetime.strptime(student_dob, '%Y-%m-%d')
     today = datetime.now()
@@ -223,6 +236,7 @@ def check_age(student_dob):
     return False
 
 
+#cập nhật thông tin học sinh
 def update_student(student_id, student_name, student_dob, student_address, student_phone, student_mail):
     std = Student.query
     if student_id:
@@ -239,10 +253,16 @@ def update_student(student_id, student_name, student_dob, student_address, stude
 
 
 #duyệt ds học sinh
-def student_search_to_list():
-    query = "SELECT * FROM student LEFT JOIN student_class ON student.id=student_class.student_id;"
-    df = db.session.execute(query).all()
-    return df
+def student_search_to_list(student_name=None, student_mshs=None):
+    query = Student.query
+
+    if student_name:
+        query = query.filter(Student.name.contains(student_name))
+
+    if student_mshs:
+        query = query.filter(Student.id.__eq__(student_mshs))
+
+    return query.all()
 
 
 #đếm sĩ số lớp
@@ -360,17 +380,59 @@ def stats_pass_subject(kw=None, subject=None, semester=None, class_name=None):
 #kiểm tra số lượng học sinh qua 1 môn chỉ định của các lớp
 def mutil_class_pass(kw=None, subject=None, semester=None):
     class_name = MyClass.query.all()
-    list = []
+    list_pass = []
     stt = 0
     for s in class_name:
         stt += 1
-        list.append({
+        list_pass.append({
             'stt': stt,
             'pass': stats_pass_subject(kw, subject, semester, s.name)
         })
-    return list
+    return list_pass
+
+
+def check_max_student():
+    query = Regulation.query.all()
+    for i in query:
+        if i.type_regulation == "Sĩ số lớp":
+            return i.size
+
+
+def save_class_list(class_name, student_list):
+    my_cl = my_class()
+    st = StudentClass.query.all()
+    flag = False
+    if class_name:
+        for i in my_cl:
+            if class_name == i.name:
+                my_cl = i
+                flag = True
+                break
+        if not flag:
+            my_cl = MyClass(name=class_name)
+            db.session.add(my_cl)
+            flag = True
+        for s in student_list:
+            if flag:
+                for i in st:
+                    if i.student_id == int(s['id']) and i.my_class.name == class_name:
+                        return {
+                            'student_id': s['id'],
+                            'class_name': class_name
+                        }
+                    else:
+                        stud_cl = StudentClass(my_class=my_cl, student_id=s['id'])
+                        db.session.add(stud_cl)
+                        try:
+                            db.session.commit()
+                        except:
+                            return False
+                        else:
+                            return True
+    else:
+        return False
 
 
 if __name__ == '__main__':
     with app.app_context():
-        print(student_search_to_list())
+        print(check_max_student())

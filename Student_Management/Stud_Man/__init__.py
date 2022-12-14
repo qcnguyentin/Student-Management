@@ -11,6 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%s@localhost/std-m
     '0979620120@Hau')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['STUDENT'] = 'student'
+app.config['STUDENT-LIST'] = 'student_list'
 db = SQLAlchemy(app=app)
 
 login = LoginManager(app=app)

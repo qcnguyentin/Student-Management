@@ -20,11 +20,22 @@ app.add_url_rule('/student', 'student', controller.student)
 app.add_url_rule('/api/student/add-student', 'add-student', controller.add_student, methods=['post'])
 app.add_url_rule('/api/student/add-student', 'update-student', controller.update_student, methods=['update'])
 app.add_url_rule('/build-class', 'class-list', controller.build_class)
-app.add_url_rule('/api/build-class/<class_id>/list', 'add-to-list', controller.add_student_list)
+app.add_url_rule('/list-student', 'list-student', controller.list_student)
+app.add_url_rule('/api/list-student', 'add-to-list', controller.add_student_to_list, methods=['post'])
+app.add_url_rule('/api/list-student/<student_id>', 'delete-list', controller.delete_student_from_list, methods=['delete'])
+app.add_url_rule('/api/list-student', 'build-list', controller.build)
+
 
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id=user_id)
+
+
+@app.context_processor
+def common_attribute():
+    return {
+        "student_list": utils.list_stats(session.get(app.config['STUDENT-LIST']))
+    }
 
 
 if __name__ == '__main__':

@@ -1,50 +1,67 @@
 {% extends 'layout/base.html' %}
-{% block title %} Trang chủ {% endblock %}
+{% block title %} Trang chủ {% endblock %}3
 
+{% block js %}
+<script src="{{ url_for('static', filename='js/list_studen.js') }}"></script>
+{% endblock %}
 {% block content %}
-{% if user_role == 1 %}
-<h1 class="text-center">Bảng điểm trung bình</h1>
-<div class="container mt-3" id="get_download">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th colspan="5" class="text-center">BẢNG ĐIỂM MÔN HỌC</th>
-      </tr>
-      <tr>
-        <th colspan="5">Năm học: {{ year }}</th>
-      </tr>
-      <tr>
-        <th>STT</th>
-        <th>Họ Tên</th>
-        <th>Lớp</th>
-        <th>Điểm TB HK1</th>
-        <th>Điểm TB HK2</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for i in score %}
-      <tr>
-        <td>{{ i.stt }}</td>
-        <td>{{ i.student_name }}</td>
-        <td>{{ i.student_class_name }}</td>
-        <td>{{ i.score_avg1 }}</td>
-        <td>{{ i.score_avg2 }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-<button type="button" id="download-pdf" class="btn btn-danger" style="margin-left: 10%">Xuất PDF</button>
-<script>
-  window.onload = function(){
-      document.getElementById("download-pdf").addEventListener("click",()=>{
-        var get_download = this.document.getElementById("get_download");
-        console.log(get_download);
-        console.log(window);
-        html2pdf(get_download);
-      })
-    }
-</script>
+{% if user_role == 2 or user_role == 3 %}
+<h1 class="text-center">DANH SÁCH LỚP</h1>
+<form action="/list-student">
+    <div class="container mt-3" id="get_download"style="overflow: auto; height: 350px">
+        <table class="table table-bordered" >
+            <thead>
+            <tr>
+                <th colspan="4">
+                    <h5>Nhập tên lớp</h5>
+                    <input type="text" name="class-name" id="class-name-build">
+                </th>
+
+                <th colspan="4">Sĩ số: <span class="list-counter text-primary" id="size-of_class" onchange="checkOver()">{{ student_list.size_of_class }}</span>
+                </th>
+            </tr>
+            <tr>
+                <th>Mã học sinh</th>
+                <th>Tên</th>
+                <th>Giới tính</th>
+                <th>Ngày sinh</th>
+                <th>Quê quán</th>
+                <th>SĐT</th>
+                <th>Mail</th>
+                <th>
+                </th>
+            </tr>
+            </thead>
+
+            {% if 'student_list' in session and session['student_list'] %}
+            <tbody>
+            {% for s in session['student_list'].values() %}
+            <tr class="tb-notification-content" id="student-list{{ s.id }}">
+                <td>{{ s.id }}</td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.sex }}</td>
+                <td>{{ s.dob }}</td>
+                <td>{{ s.address }}</td>
+                <td>{{ s.sdt }}</td>
+                <td>{{ s.email }}</td>
+                <td>
+                    <input type="button" value="xóa" class="btn btn-success" onclick="deleteList({{ s.id }})">
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            {% else %}
+            <tbody>
+            <tr>
+                <td>Chưa có học sinh nào</td>
+                <td><a href="/build-class">Thêm học sinh</a> vào danh sách</td>
+            </tr>
+            </tbody>
+            {% endif %}
+        </table>
+    </div>
+    <button type="submit" class="btn btn-danger" style="margin-left: 10%" onclick="build()">lập danh sách</button>
+</form>
 {% else %}
 <h1 class="text-center text-success">BẠN KHÔNG ĐƯỢC CẤP QUYỀN</h1>
 {% endif %}

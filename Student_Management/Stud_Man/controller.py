@@ -222,7 +222,6 @@ def student():
     student_mshs = request.args.get("student-mshs")
     if not student_name:
         student_name = ''
-    print(type(student_mshs))
     name = dao.student()
     student_id_key = []
     key = app.config['STUDENT']
@@ -277,7 +276,8 @@ def add_student():
         })
     else:
         name = dao.add_student(student_name=student_name, student_sex=student_sex, student_dob=student_dob,
-                               student_address=student_address, student_email=student_email, student_phone=student_phone)
+                               student_address=student_address, student_email=student_email,
+                               student_phone=student_phone)
         if str(len(name)) not in student_session:
             student_session[str(len(name))] = {
                 "student_id": str(len(name)),
@@ -334,8 +334,8 @@ def update_student():
             student_session['student_address'] = student_address
             student_session['student_dob'] = student_dob
             student_session['student_phone'] = student_phone
-            print(student_session[student_id]['student_address'])
             student_session['student_mail'] = student_email
+            session[key] = student_session
             if check:
                 return jsonify({
                     'error': "Cập nhật thành công"
@@ -350,15 +350,73 @@ def build_class():
     kw = request.args.get('keyword')
     student_name = request.args.get('student-name')
     student_mshs = request.args.get('student-mshs')
-    class_of_student = dao.my_class()
-    student_list = dao.student_search_to_list()
+    student_list = dao.student_search_to_list(student_name=student_name, student_mshs=student_mshs)
+    list_class = dao.my_class()
     if kw:
         kw = kw
     else:
         kw = ''
     user_role = check_user_role()
-    return render_template('build_class.html', user_role=user_role, )
+    return render_template('build_class.html', user_role=user_role, student_list=student_list, kw=kw, list_class=list_class)
 
 
-def add_student_list():
-    return None
+def list_student():
+    user_role = check_user_role()
+    return render_template('list_student.html', user_role=user_role)
+
+
+def add_student_to_list():
+    data = request.json
+    id = str(data['id'])
+    name = data['name']
+    sex = data['sex']
+    dob = data['dob']
+    address = data['address']
+    sdt = data['sdt']
+    email = data['email']
+
+    key = app.config['STUDENT-LIST']
+    student_list = session.get(key, {})
+
+    save_err = []
+
+    if not id in student_list:
+        student_list[id] = {
+            "id": id,
+            "name": name,
+            "sex": sex,
+            "dob": dob,
+            "address": address,
+            "sdt": sdt,
+            "email": email,
+            "size_of_class": 1
+        }
+    session[key] = student_list
+    return jsonify(utils.list_stats(student_list))
+
+
+def delete_student_from_list(student_id):
+    key = app.config['STUDENT-LIST']
+    student_list = session.get(key, {})
+    if student_list and student_id in student_list:
+        assert isinstance(student_id, object)
+        del student_list[student_id]
+
+    session[key] = student_list
+    return jsonify(utils.list_stats(student_list))
+
+
+def build():
+    key = app.config['STUDENT-LIST']
+    student_list = session.get(key, {})
+    class_name = request.args.get('class-name')
+    try:
+        check = dao.save_class_list(class_name, student_list)
+        if not check:
+            return jsonify({
+                'status': 404
+            })
+    except:
+        return jsonify({'status': 500})
+    else:
+        return jsonify({'status': 200})
