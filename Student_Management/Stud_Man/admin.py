@@ -87,10 +87,7 @@ class MyAdminView(AdminIndexView):
     @expose('/')
     def index(self):
         stats = dao.count_student_by_class()
-        if current_user.is_authenticated and current_user.user_role == UserRole.ADMIN:
-            return self.render('admin/index.html', stats=stats)
-        else:
-            return self.render('/forbidden.html')
+        return self.render('admin/index.html', stats=stats)
 
 
 admin = Admin(app=app, name="Quan ly hoc sinh", template_mode="bootstrap4", index_view=MyAdminView())

@@ -136,7 +136,7 @@ if __name__ == '__main__':
         avatar = 'https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
         u1 = User(name='Trần Nguyễn Hồng Ân', username='empleyee', password=password, user_role=UserRole.EMPLOYEE,
         avatar = 'https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
-        u2 = User(name='Đậu Xuân Hậu', username='teacher1', password=password, user_role=UserRole.TEACHER,
+        u2 = User(name='Đặng Xuân Hậu', username='teacher1', password=password, user_role=UserRole.TEACHER,
                   avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
         u3 = User(name='Nguyễn Văn A', username='teacher6', password=password, user_role=UserRole.TEACHER,
                   avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
