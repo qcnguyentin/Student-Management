@@ -23,7 +23,7 @@ app.add_url_rule('/build-class', 'class-list', controller.build_class)
 app.add_url_rule('/list-student', 'list-student', controller.list_student)
 app.add_url_rule('/api/list-student', 'add-to-list', controller.add_student_to_list, methods=['post'])
 app.add_url_rule('/api/list-student/<student_id>', 'delete-list', controller.delete_student_from_list, methods=['delete'])
-app.add_url_rule('/api/list-student', 'build-list', controller.build)
+app.add_url_rule('/api/build-student', 'build-list', controller.build, methods=['post'])
 
 
 @login.user_loader
