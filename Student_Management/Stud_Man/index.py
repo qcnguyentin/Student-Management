@@ -1,6 +1,5 @@
-from Stud_Man import app, admin, login, controller, utils
+from Stud_Man import app, admin, login, controller, utils, dao
 from flask import session
-import dao
 
 
 app.add_url_rule('/', 'index', controller.index)

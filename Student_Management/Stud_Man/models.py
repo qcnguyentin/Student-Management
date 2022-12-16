@@ -60,7 +60,7 @@ class MyClass(BaseModel):
 class Student(BaseModel):
     name = Column(String(50), nullable=False)
     sex = Column(String(20), nullable=False)
-    dob = Column(String, nullable=False)
+    dob = Column(String(50), nullable=False)
     address = Column(String(100), nullable=False)
     phone = Column(String(20))
     email = Column(String(100))
@@ -128,15 +128,21 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
 
-        # import hashlib
-        #
-        # password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
-        #
-        # # u = User(name='Nguyễn Văn A', username='teacher6', password=password, user_role=UserRole.TEACHER,
-        # #          avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
-        # u1 = User(name='Trần Thị B', username='teacher7', password=password, user_role=UserRole.TEACHER,
-        #          avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
-        # u2 = User(name='Võ Văn C', username='teacher8', password=password, user_role=UserRole.TEACHER,
-        #          avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
-        # db.session.add_all([u1, u2])
-        # db.session.commit()
+        import hashlib
+
+        password = str(hashlib.md5('123456'.encode('utf-8')).hexdigest())
+
+        u = User(name='Nguyễn Văn Hậu', username='admin', password=password, user_role=UserRole.ADMIN,
+        avatar = 'https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
+        u1 = User(name='Trần Nguyễn Hồng Ân', username='empleyee', password=password, user_role=UserRole.EMPLOYEE,
+        avatar = 'https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
+        u2 = User(name='Đậu Xuân Hậu', username='teacher1', password=password, user_role=UserRole.TEACHER,
+                  avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
+        u3 = User(name='Nguyễn Văn A', username='teacher6', password=password, user_role=UserRole.TEACHER,
+                  avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
+        u4 = User(name='Trần Thị B', username='teacher7', password=password, user_role=UserRole.TEACHER,
+                  avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
+        u5 = User(name='Võ Văn C', username='teacher8', password=password, user_role=UserRole.TEACHER,
+                  avatar='https://res.cloudinary.com/dxxwcby8l/image/upload/v1646729569/fi9v6vdljyfmiltegh7k.jpg')
+        db.session.add_all([u1, u2])
+        db.session.commit()
