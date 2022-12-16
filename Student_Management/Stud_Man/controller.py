@@ -409,13 +409,25 @@ def delete_student_from_list(student_id):
 def build():
     key = app.config['STUDENT-LIST']
     student_list = session.get(key, {})
-    class_name = request.args.get('class-name')
+    data = request.json
+    class_name = data['class_name']
+    size_of_class = data['size_of_class']
     try:
-        check = dao.save_class_list(class_name, student_list)
-        if not check:
+        if class_name:
+            if dao.check_max_student() >= int(size_of_class):
+                check = dao.save_class_list(class_name, student_list)
+                if not check:
+                    return jsonify({
+                        'status': 408
+                    })
+            else:
+                return jsonify({
+                    'status': 405
+                })
+        else:
             return jsonify({
-                'status': 404
-            })
+                    'status': 404
+                })
     except:
         return jsonify({'status': 500})
     else:

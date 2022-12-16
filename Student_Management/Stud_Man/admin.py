@@ -77,14 +77,20 @@ class StatsView(AuthenticatedView):
         sj = request.args.get('subject')
         sm = request.args.get('semester')
         stats = dao.mutil_class_pass(kw, sj, sm)
-        return self.render('admin/stats.html', subject=subject, stats=stats)
+        if current_user.is_authenticated and current_user.user_role == UserRole.ADMIN:
+            return self.render('admin/stats.html', subject=subject, stats=stats)
+        else:
+            return self.render('/forbidden.html')
 
 
 class MyAdminView(AdminIndexView):
     @expose('/')
     def index(self):
         stats = dao.count_student_by_class()
-        return self.render('admin/index.html', stats=stats)
+        if current_user.is_authenticated and current_user.user_role == UserRole.ADMIN:
+            return self.render('admin/index.html', stats=stats)
+        else:
+            return self.render('/forbidden.html')
 
 
 admin = Admin(app=app, name="Quan ly hoc sinh", template_mode="bootstrap4", index_view=MyAdminView())

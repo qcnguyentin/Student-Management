@@ -415,13 +415,13 @@ def save_class_list(class_name, student_list):
         for s in student_list:
             if flag:
                 for i in st:
-                    if i.student_id == int(s['id']) and i.my_class.name == class_name:
+                    if i.student_id == int(s) and i.my_class.name == class_name:
                         return {
-                            'student_id': s['id'],
+                            'student_id': s,
                             'class_name': class_name
                         }
                     else:
-                        stud_cl = StudentClass(my_class=my_cl, student_id=s['id'])
+                        stud_cl = StudentClass(my_class=my_cl, student_id=int(s))
                         db.session.add(stud_cl)
                         try:
                             db.session.commit()
@@ -431,8 +431,3 @@ def save_class_list(class_name, student_list):
                             return True
     else:
         return False
-
-
-if __name__ == '__main__':
-    with app.app_context():
-        print(check_max_student())

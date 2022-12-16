@@ -34,7 +34,6 @@ function updateStudent(){
         }
     }).then((res) => res.json()).then((data) => {
        alert(data.error)
-       location.reload()
     }) // js promise
 }
 
